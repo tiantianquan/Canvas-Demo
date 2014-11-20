@@ -111,10 +111,10 @@ var CurveDrew = (function() {
       r: 255,
       g: 255,
       b: 255,
-      cx: Math.random() * 1000,
-      cy: Math.random() * 1000,
-      ex: Math.random() * 1000,
-      ey: Math.random() * 1000,
+      cx: Math.random() * 2000,
+      cy: Math.random() * 2000,
+      ex: Math.random() * 2000,
+      ey: Math.random() * 2000,
       ease: Linear.easeNone,
       onComplete: that._tweenOnComplete,
     })
@@ -153,10 +153,10 @@ function curvemain() {
     var cr = new CurveDrew(
       c.width / 2,
       c.height / 2,
-      Math.random() * 1000,
-      Math.random() * 1000,
-      Math.random() * 1000,
-      Math.random() * 1000
+      Math.random() * 2000,
+      Math.random() * 2000,
+      Math.random() * 2000,
+      Math.random() * 2000
     )
     cr.tweenDur(20).tweenOnComplete(function(self) {
       self.tween()
@@ -173,8 +173,8 @@ function curvemain() {
 curvemain()
 
 
-window.addEventListener('resize', function() {
-  c.width = document.querySelector('header').offsetWidth
-  c.height = document.querySelector('header').offsetHeight
-  curvemain()
-});
+// window.addEventListener('resize', function() {
+//   c.width = document.querySelector('header').offsetWidth
+//   c.height = document.querySelector('header').offsetHeight
+//   curvemain()
+// });

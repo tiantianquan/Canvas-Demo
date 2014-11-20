@@ -4666,8 +4666,9 @@ header {
     font-size: 100px;
     
     font-family: Roboto;
-    font-weight: 300;
-    letter-spacing: -2px; }
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: #69606b; }
 
 #c {
   top: 0;
