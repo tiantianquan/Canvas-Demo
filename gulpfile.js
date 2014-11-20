@@ -5,15 +5,15 @@ var connect = require('gulp-connect');
 
 //检查代码
 gulp.task('lint', function() {
-  gulp.src('./js/*.js')
-    .pipe(jshint())
+  gulp.src('./app/**/*.js')
+    .pipe(jshint({asi:true}))
     .pipe(jshint.reporter('default'))
     .pipe(connect.reload())
 })
 
 //sass
 gulp.task('sass', function() {
-  gulp.src('./scss/*.scss')
+  gulp.src('./app/**/*.scss')
     .pipe(sass({
       // includePaths: require('node-bourbon').with('other/path', 'another/path')
       // - or -
@@ -23,7 +23,7 @@ gulp.task('sass', function() {
       // includePaths: ['./bower_components/bootstrap-sass-official/assets/stylesheets']
       errLogToConsole: true
     }))
-    .pipe(gulp.dest('./css'))
+    .pipe(gulp.dest('./app'))
     .pipe(connect.reload())
 })
 
@@ -33,13 +33,13 @@ gulp.task('html', function() {
 })
 
 gulp.task('watch', function() {
-  gulp.watch('./*.html', function() {
+  gulp.watch('./app/**/*.html', function() {
     gulp.run('html')
   })
-  gulp.watch('./js/*.js', function() {
+  gulp.watch('./app/**/*.js', function() {
     gulp.run('lint')
   })
-  gulp.watch('./scss/*.scss', function() {
+  gulp.watch('./app/**/*.scss', function() {
     gulp.run('sass')
   })
 })
