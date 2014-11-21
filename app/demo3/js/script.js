@@ -93,7 +93,7 @@ var Octagon = (function() {
       ctx.lineTo(point[0], point[1])
     }
     ctx.closePath()
-    ctx.strokeStyle = '#000'
+    ctx.strokeStyle = '#fff'
     ctx.stroke()
   }
   return _octagon
@@ -109,27 +109,35 @@ function main() {
 
   tween.go = function() {
     tween.rotate = 0
-    TweenLite.to(tween, .8 ,{
+    TweenLite.to(tween, .8, {
       rotate: 2 * Math.PI,
       onUpdate: function() {
-        o.rotate(tween.rotate)
-        o1.rotate(-tween.rotate)
+        list.forEach(function(o,index) {
+          if(index%2===0)
+            o.rotate(tween.rotate)
+          else
+            o.rotate(-tween.rotate)
+        })
       },
       onComplete: tween.go,
       ease: Linear.easeNone
     })
   }
 
-  var o = new Octagon().long(tween.long*.21).center([c.width / 2, c.height / 2])
-  var o1 = new Octagon().long(tween.long*.2).center([c.width / 2, c.height / 2])
+  var list = []
+  for (var i = 1; i <= 2; i++) {
+    var o = new Octagon().long(tween.long * (.2 + .01 * i)).center([c.width / 2, c.height / 2])
+    list.push(o)
+  }
 
   tween.go()
 
   function loop() {
     // ctx.clean()
     ctx.clearRect(0, 0, c.width, c.height)
-    o.drew()
-    o1.drew()
+    list.forEach(function(o){
+      o.drew()
+    })
     window.requestAnimationFrame(loop)
   }
   loop()
