@@ -106,17 +106,24 @@ function main() {
     centerY: c.height / 2,
     rotate: 0,
   }
-
   tween.go = function() {
     tween.rotate = 0
-    TweenLite.to(tween, .8, {
+    TweenLite.to(tween, 2, {
       rotate: 2 * Math.PI,
       onUpdate: function() {
-        list.forEach(function(o,index) {
-          if(index%2===0)
-            o.rotate(tween.rotate)
-          else
-            o.rotate(-tween.rotate)
+        var that = this
+        list.forEach(function(o, index) {
+          if (that.time() < that.duration()/2) {
+            if (index % 2 === 0)
+              o.rotate(tween.rotate)
+            else
+              o.rotate(-tween.rotate)
+          }else{
+            if (index % 2 === 0)
+              o.rotate(-tween.rotate)
+            else
+              o.rotate(tween.rotate)
+          }
         })
       },
       onComplete: tween.go,
@@ -135,7 +142,7 @@ function main() {
   function loop() {
     // ctx.clean()
     ctx.clearRect(0, 0, c.width, c.height)
-    list.forEach(function(o){
+    list.forEach(function(o) {
       o.drew()
     })
     window.requestAnimationFrame(loop)
