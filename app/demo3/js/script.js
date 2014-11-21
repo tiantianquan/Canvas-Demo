@@ -109,7 +109,7 @@ function main() {
 
   tween.go = function() {
     tween.rotate = 0
-    TweenLite.to(tween, 1, {
+    TweenLite.to(tween, .8 ,{
       rotate: 2 * Math.PI,
       onUpdate: function() {
         o.rotate(tween.rotate)
@@ -121,10 +121,7 @@ function main() {
   }
 
   var o = new Octagon().long(tween.long*.21).center([c.width / 2, c.height / 2])
-    .rotate(.9 * 2 * Math.PI)
-
   var o1 = new Octagon().long(tween.long*.2).center([c.width / 2, c.height / 2])
-    .rotate(-0.5 * 2 * Math.PI)
 
   tween.go()
 
