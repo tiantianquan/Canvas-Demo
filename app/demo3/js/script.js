@@ -2,6 +2,7 @@ var c = document.querySelector('#c')
 var ctx = c.getContext('2d')
 c.width = window.innerWidth
 c.height = window.innerHeight
+ctx.globalCompositeOperation = 'lighter'
 ctx.clean = function() {
   ctx.fillStyle = '#ccc'
   ctx.fillRect(0, 0, c.width, c.height)
@@ -135,7 +136,11 @@ var CirclePoint = (function() {
 var Mixco = (function() {
   var gs = toolFn.getSetProp
   var _mixco = function() {
-    this._circles = []
+    this._circles = {
+      green: [],
+      blue: [],
+      red: []
+    }
     this.list.push(this)
     this._radii
   }
@@ -147,18 +152,22 @@ var Mixco = (function() {
   }
   _mixco.prototype.createCircles = function(radii) {
     // return gs.call(this, arguments, '_circles')
-    if (!!radii)
-      this._radii = radii
     if (!this._octagon)
       return
+    if (!!radii)
+      this._radii = radii
     var that = this
     this._octagon._point.forEach(function(p, index) {
-      if (!!that._circles[index])
-        that._circles[index].center(p).radii(that._radii)
-      else {
-        var circle = new CirclePoint().center(p).radii(that._radii)
-        that._circles[index] = circle
-      }
+      // if (!!that._circles[index])
+      //   that._circles[index].center(p).radii(that._radii)
+      // else {
+      var circleB = new CirclePoint().center(p).radii(that._radii)
+      var circleR = new CirclePoint().center(p).radii(that._radii)
+      var circleG = new CirclePoint().center(p).radii(that._radii)
+      that._circles.blue[index] = circleB
+      that._circles.red[index] = circleR
+      that._circles.green[index] = circleG
+        // }
     })
   }
 
@@ -175,8 +184,14 @@ var Mixco = (function() {
   }
   _mixco.prototype.drew = function(ost, ofs, cst, cfs) {
     this._octagon.drew(ost, ofs)
-    this._circles.forEach(function(c) {
-      c.drew(cst, cfs)
+    this._circles.blue.forEach(function(c) {
+      c.drew(cst, 'rgba(0,0,255,1)')
+    })
+    this._circles.red.forEach(function(c) {
+      c.drew(cst, 'rgba(255,0,0,1)')
+    })
+    this._circles.green.forEach(function(c) {
+      c.drew(cst, 'rgba(0,255,0,1)')
     })
   }
   return _mixco
@@ -189,30 +204,75 @@ function main() {
     centerX: c.width / 2,
     centerY: c.height / 2,
     rotate: 0,
+    circleL: 0
   }
   tween.go = function() {
-    // tween.rotate = 0
-    TweenLite.to(tween, 1, {
+    TweenLite.to(tween, 2, {
       rotate: tween.rotate + 22.5 / 180 * Math.PI,
-      delay: 2,
+      circleL: tween.circleL + 50,
+      delay: .5,
       onUpdate: function() {
         var that = this
         Mixco.list.forEach(function(m, index) {
-          // if (that.time() < that.duration() / 2) {
-          //   if (index % 2 === 0)
-          //     m.rotate(tween.rotate)
-          //   else
-          //     m.rotate(-tween.rotate)
-          // } else {
-          //   if (index % 2 === 0)
-          //     m.rotate(-tween.rotate)
-          //   else
-          //     m.rotate(tween.rotate)
-          // }
           if (index % 2 === 0)
             m.rotate(tween.rotate + 22.5 / 180 * Math.PI)
           else
             m.rotate(-tween.rotate)
+
+          var circleL = tween.circleL
+          m._circles.blue.forEach(function(b) {
+              var i1 = b._center[0]
+              var i2 = b._center[1]
+              b._center = [i1 - circleL, i2 - circleL]
+            })
+            // m._circles.red.forEach(function(b) {
+            //   var i1 = b._center[0]
+            //   var i2 = b._center[1]
+            //   b._center = [i1 + circleL, i2 + circleL]
+            // })
+
+          m._circles.green.forEach(function(b) {
+            var i1 = b._center[0]
+            var i2 = b._center[1]
+            b._center = [i1 + circleL, i2 - circleL]
+          })
+        })
+      },
+      onComplete: tween.rego,
+      ease: Linear.easeNone
+    })
+  }
+
+  tween.rego = function() {
+    TweenLite.to(tween, 2, {
+      rotate: tween.rotate + 22.5 / 180 * Math.PI,
+      circleL: tween.circleL - 50,
+      delay: .5,
+      onUpdate: function() {
+        var that = this
+        Mixco.list.forEach(function(m, index) {
+          if (index % 2 === 0)
+            m.rotate(tween.rotate + 22.5 / 180 * Math.PI)
+          else
+            m.rotate(-tween.rotate)
+
+          var circleL = tween.circleL
+          m._circles.blue.forEach(function(b) {
+              var i1 = b._center[0]
+              var i2 = b._center[1]
+              b._center = [i1 - circleL, i2 - circleL]
+            })
+            // m._circles.red.forEach(function(b) {
+            //   var i1 = b._center[0]
+            //   var i2 = b._center[1]
+            //   b._center = [i1 + circleL, i2 + circleL]
+            // })
+
+          m._circles.green.forEach(function(b) {
+            var i1 = b._center[0]
+            var i2 = b._center[1]
+            b._center = [i1 + circleL, i2 - circleL]
+          })
         })
       },
       onComplete: tween.go,
@@ -220,12 +280,14 @@ function main() {
     })
   }
 
+
+
   for (var i = 1; i <= 20; i++) {
-    var o = new Octagon().long(i * i * 0.04 * i).center([c.width / 2, c.height / 2])
+    var o = new Octagon().long(i * i * 0.002 * i * i).center([c.width / 2, c.height / 2])
     if (i % 2 !== 0) {
       o.rotate(22.5 / 180 * Math.PI)
     }
-    var mixco = new Mixco().octagon(o).circles(i * i * i * 0.003)
+    var mixco = new Mixco().octagon(o).circles(i * i * i * i * 0.0002)
   }
 
   tween.go()
@@ -234,7 +296,7 @@ function main() {
     // ctx.clean()
     ctx.clearRect(0, 0, c.width, c.height)
     Mixco.list.forEach(function(m) {
-      m.drew(null, null, null, '#fff')
+      m.drew('', null, null, '#fff')
     })
     window.requestAnimationFrame(loop)
   }
