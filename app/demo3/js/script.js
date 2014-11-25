@@ -161,9 +161,10 @@ var Mixco = (function() {
       // if (!!that._circles[index])
       //   that._circles[index].center(p).radii(that._radii)
       // else {
-      var circleB = new CirclePoint().center(p).radii(that._radii)
-      var circleR = new CirclePoint().center(p).radii(that._radii)
-      var circleG = new CirclePoint().center(p).radii(that._radii)
+      var i = 2
+      var circleB = new CirclePoint().center([p[0]+i,p[1]+i]).radii(that._radii)
+      var circleR = new CirclePoint().center([p[0]-i,p[1]-i]).radii(that._radii)
+      var circleG = new CirclePoint().center([p[0]+i,p[1]-i]).radii(that._radii)
       that._circles.blue[index] = circleB
       that._circles.red[index] = circleR
       that._circles.green[index] = circleG
@@ -209,7 +210,7 @@ function main() {
   tween.go = function() {
     TweenLite.to(tween, 2, {
       rotate: tween.rotate + 22.5 / 180 * Math.PI,
-      circleL: tween.circleL + 50,
+      // circleL: tween.circleL + 50,
       delay: .5,
       onUpdate: function() {
         var that = this
@@ -238,7 +239,7 @@ function main() {
           })
         })
       },
-      onComplete: tween.rego,
+      onComplete: tween.go,
       ease: Linear.easeNone
     })
   }
@@ -246,7 +247,7 @@ function main() {
   tween.rego = function() {
     TweenLite.to(tween, 2, {
       rotate: tween.rotate + 22.5 / 180 * Math.PI,
-      circleL: tween.circleL - 50,
+      // circleL: tween.circleL - 50,
       delay: .5,
       onUpdate: function() {
         var that = this
