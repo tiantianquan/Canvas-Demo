@@ -87,7 +87,7 @@ var curve = new Curve({
 })
 
 var tween = {
-  v: 10,
+  v: 1.1,
 }
 TweenLite.to(tween, 20, {
   v: 1,

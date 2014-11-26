@@ -108,13 +108,13 @@ var CurveDrew = (function() {
   curveDrew.prototype.tween = function() {
     var that = this
     TweenLite.to(that, that._tweenDur, {
-      r: 255,
-      g: 255,
-      b: 255,
-      cx: Math.random() * 2000,
-      cy: Math.random() * 2000,
-      ex: Math.random() * 2000,
-      ey: Math.random() * 2000,
+      r: 230,
+      g: 230,
+      b: 230,
+      cx: Math.random() * 1000,
+      cy: Math.random() * 600,
+      ex: Math.random() * 1000,
+      ey: Math.random() * 600,
       ease: Linear.easeNone,
       onComplete: that._tweenOnComplete,
     })
@@ -149,14 +149,14 @@ function getRandomInt(min, max) {
 }
 
 function curvemain() {
-  for (var i = 1; i <= 500; i++) {
+  for (var i = 1; i <= 100; i++) {
     var cr = new CurveDrew(
       c.width / 2,
       c.height / 2,
-      Math.random() * 2000,
-      Math.random() * 2000,
-      Math.random() * 2000,
-      Math.random() * 2000
+      Math.random() * 1000,
+      Math.random() * 600,
+      Math.random() * 1000,
+      Math.random() * 600
     )
     cr.tweenDur(20).tweenOnComplete(function(self) {
       self.tween()
@@ -164,13 +164,13 @@ function curvemain() {
   }
 
   function loop() {
-    ctx.clean()
+    ctx.clearRect(0, 0, c.width, c.height)
     cr.updateAll()
-    window.requestAnimationFrame(loop)
+    return window.requestAnimationFrame(loop)
   }
-  loop()
+  return loop()
 }
-curvemain()
+var frame = curvemain()
 
 
 // window.addEventListener('resize', function() {
@@ -178,3 +178,17 @@ curvemain()
 //   c.height = document.querySelector('header').offsetHeight
 //   curvemain()
 // });
+
+
+function scrollNavOpc() {
+  var navBar = $('.navbar')
+  var headTop = 600
+  $(window).on('scroll', function(e) {
+    var top = navBar.offset().top
+    var newOpc = top <= headTop ? top / headTop * 0.9 : 0.9
+    navBar.css('background', 'rgba(230,230,230,' + newOpc + ')')
+    console.log(frame)
+    // window.cancelAnimationFrame(frame)
+  })
+}
+scrollNavOpc()
