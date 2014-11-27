@@ -52,7 +52,7 @@ var Ball = function(opt) {
     }
     $(canv).on('mousedown', function(e) {
       if (isInBall.call(that, e.pageX, e.pageY))
-        that.changeColor('red')
+        that.changeColor('rgba(255,0,0,0.3)')
 
       $(canv).on('mousemove', function(e) {
         if (!!that.moveTween)
@@ -134,7 +134,7 @@ Ball.prototype.check = Ball.check = function() {
       ball.cy + ball.radii >= ball.canv.height ||
       ball.cy - ball.radii <= 0) {
       if (!!ball.moveTween) {
-        ball.crashWall()
+        //ball.crashWall()
       }
     }
 
@@ -146,12 +146,13 @@ Ball.isCheck = true
 
 function main() {
   for (var i = 0; i < 100; i++) {
-    new Ball({
+   var ball =  new Ball({
       radii: 30,
       cx: tool.getRandomInt(c.width),
       cy: tool.getRandomInt(c.height),
       fillcolor: 'rgba(' + tool.getRandomInt(0, 255) + ',' + tool.getRandomInt(0, 255) + ',' + tool.getRandomInt(0, 255) + ',0.3)'
     })
+    ball.move()
   }
 
   function loop() {
@@ -172,3 +173,4 @@ function main() {
   loop()
 }
 main()
+
