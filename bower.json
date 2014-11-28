@@ -16,6 +16,7 @@
   "devDependencies": {
     "font-awesome": "~4.2.0",
     "d3": "~3.4.13",
-    "greensock": "~1.14.2"
+    "greensock": "~1.14.2",
+    "hidpi-canvas": "~1.0.9"
   }
 }
