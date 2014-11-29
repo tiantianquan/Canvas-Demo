@@ -3,7 +3,6 @@ var ctx = c.getContext('2d')
 c.width = window.innerWidth
 c.height = window.innerHeight
 
-
 function hackHighDpi(canvas, ctx) {
   var devicePixelRatio = window.devicePixelRatio || 1;
   var backingStorePixelRatio = ctx.webkitBackingStorePixelRatio ||
@@ -26,7 +25,6 @@ function hackHighDpi(canvas, ctx) {
 
     ctx.scale(ratio, ratio);
   }
-
 }
 
 hackHighDpi(c, ctx)
@@ -40,14 +38,22 @@ var LineCircle = function(opt) {
   this.gapAngle = opt.gapAngle || 0.01 * 2 * Math.PI
   this.strokeStyle = opt.strokeStyle || '#000'
   this.lineWidth = opt.lineWidth || 1
+
+  this.dynamicPercent = opt.dynamicPercent || 1
 }
 
-LineCircle.prototype.getX = function(angle) {
-  return this.cx + Math.cos(angle) * this.radii
+LineCircle.prototype.getX = function(angle, percent) {
+  if(percent != undefined)
+    return this.cx + Math.cos(angle) * this.radii * percent
+  else
+    return this.cx + Math.cos(angle) * this.radii 
 }
 
-LineCircle.prototype.getY = function(angle) {
-  return this.cy - Math.sin(angle) * this.radii
+LineCircle.prototype.getY = function(angle, percent) {
+  if(percent != undefined)
+    return this.cy - Math.sin(angle) * this.radii * percent
+  else
+    return this.cy - Math.sin(angle) * this.radii
 }
 LineCircle.prototype.drew = function() {
   ctx.beginPath()
@@ -60,7 +66,7 @@ LineCircle.prototype.drew = function() {
   ctx.stroke()
 }
 
-LineCircle.prototype.drew2 = function() {
+LineCircle.prototype.drewVertical = function() {
   for (var i = 0; i < 2 * Math.PI; i += this.gapAngle) {
     ctx.moveTo(this.getX(i), this.getY(0))
     ctx.lineTo(this.getX(i), this.getY(i))
@@ -70,6 +76,26 @@ LineCircle.prototype.drew2 = function() {
   ctx.stroke()
 }
 
+LineCircle.prototype.tween = function() {
+  TweenLite.to(this, 50, {
+    dynamicPercent: 10
+  })
+}
+
+LineCircle.prototype.drewDynamic = function() {
+  ctx.beginPath()
+  for (var i = 0; i < 2 * Math.PI; i += this.gapAngle) {
+    ctx.moveTo(this.getX(this.startAngle), this.getY(this.startAngle))
+    ctx.lineTo(this.getX(i, this.dynamicPercent), this.getY(i, this.dynamicPercent))
+  }
+  ctx.strokeStyle = this.strokeStyle
+  ctx.lineWidth = this.lineWidth
+  ctx.stroke()
+}
+
+
+
+
 
 // new LineCircle({
 //   cy: 200,
@@ -78,7 +104,7 @@ LineCircle.prototype.drew2 = function() {
 //   radii: 100,
 //   lineWidth: 1,
 //   startAngle: 0 * 2 * Math.PI
-// }).drew2()
+// }).drewVertical()
 
 // new LineCircle({
 //   cx: 500,
@@ -96,3 +122,33 @@ new LineCircle({
   strokeStyle: '#222',
   startAngle: 0 * 2 * Math.PI,
 }).drew()
+
+
+function main() {
+  var l = new LineCircle({
+    gapAngle: 0.005 * 2 * Math.PI,
+    radii: 250,
+    lineWidth: 2,
+    strokeStyle: '#222',
+    startAngle: .3 * 2 * Math.PI,
+    dynamicPercent: 3
+  })
+
+  l.tween()
+
+  function loop() {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+    l.drewDynamic()
+    window.requestAnimationFrame(loop)
+  }
+  loop()
+}
+
+// main()
+
+
+  // var dataUrl = c.toDataURL()
+  // var imageFoo = document.createElement('img')
+  // imageFoo.src = dataUrl
+
+// document.body.appendChild(imageFoo)
