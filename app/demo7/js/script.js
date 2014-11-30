@@ -3,9 +3,6 @@ var ctx = c.getContext('2d')
 c.width = window.innerWidth
 c.height = window.innerHeight
 
-ctx.fillStyle = 'pink'
-ctx.fillRect(0, 0, c.width, c.height)
-
 function hackHighDpi(canvas, ctx) {
   var devicePixelRatio = window.devicePixelRatio || 1;
   var backingStorePixelRatio = ctx.webkitBackingStorePixelRatio ||
@@ -60,7 +57,6 @@ var Circle = function(opt) {
     x: 0.1 * Math.PI,
     y: 0.1 * Math.PI
   }
-
 }
 Circle.prototype.getX = function(angle, inOutRadii, percent) {
   if (percent != undefined)
@@ -208,6 +204,7 @@ var tween = {
 
 
 loop(function() {
-  ctx.clearRect(0, 0, c.width, c.height)
+  // ctx.clearRect(0, 0, c.width, c.height)
+  ctx.fillRect(0,0,c.width,c.height)
   c4.arcdrew()
 })
