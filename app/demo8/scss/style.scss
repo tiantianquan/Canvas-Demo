@@ -61,4 +61,10 @@ $button-color:#444;
       inset 0 0-$side-height/2+1 0 $button-color;
     
   }
+
+  transition:all 1s;
+
+  &:hover{
+    background-color: white;
+  }
 }
