@@ -1,4 +1,4 @@
-// @import"bourbon";
+@import"bourbon";
 // @import"neat";
 // @import"bootstrap";
 // @import"font-awesome";
@@ -18,23 +18,26 @@ body, html {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-color: #eee;
 }
 $main-width: 200px;
 $main-height: 200px;
 $side-width:$main-width;
-$side-height: (3/27.5)*$main-width;
+$side-height: (3.5/27.5)*$main-width;
 $led-width:0.1*$main-width;
 $left-width: (10/27.5)*$main-width;
 $right-width:(17/27.5)*$main-width;
 
 $side-gap-width:$side-height/10;
 
-$main-left-color:lighten(#444,50%);
-$main-right-color:lighten(#444,30%);
+$main-left-color:lighten(#000,30%);
+$main-right-color:lighten($main-left-color,15%);
 $side-left-color:darken($main-left-color, 5%);
 $side-right-color:darken($main-right-color, 5%);
 $led-color:#4E98ED;
-$button-color:#444;
+$led-ani-color:lighten(#4E98ED,10%);
+// $button-color:lighten($side-left-color,10%);
+$button-color: #222;
 
 
 .ps-console {
@@ -42,8 +45,16 @@ $button-color:#444;
   width: $main-width;
   height: $main-height;
   background-color: $led-color;
-  box-shadow: inset $left-width 0 0 $main-left-color, 
-  inset 0 - $right-width 0 0 $main-right-color;
+  box-shadow: 
+    // inset $left-width 0 10px rgba(255,255,255,0.1),
+    
+    inset $left-width 0 0 $main-left-color, 
+    inset 0 - $right-width 0 0 $main-right-color,
+          10px 25px 40px #888,
+          0px 25px 20px #444;
+
+
+  @include animation(light 1s infinite alternate);
   &:before {
     position: absolute;
     content: "";
@@ -52,19 +63,38 @@ $button-color:#444;
     height: $side-height;
     background-color: $main-left-color;
     top: $main-height;
-    box-shadow: 
-      inset 0 $side-height/2 0 rgba(0,0,0,.1),
-      inset 0 0-$side-height/2+$side-gap-width 0 rgba(0,0,0,.1),
+    box-shadow:
+      //main
+      inset 0 $side-height/2 0 rgba(0,0,0,0.1),
+      inset 0 0-$side-height/2+$side-gap-width 0 rgba(0,0,0,0.1),
       inset $left-width 0 0 $side-left-color, 
       inset 0 - $right-width 0 0 $side-right-color,
       inset 0 $side-height/2 0 $button-color,
-      inset 0 0-$side-height/2+1 0 $button-color;
-    
+      inset 0 0-$side-height/2+1 0 $button-color ;
   }
 
-  transition:all 1s;
-
-  &:hover{
-    background-color: white;
+  &:after{
+    content:"";
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-image:url("../../../fonts/playstation.svg");
+    background-position: center center;
+    background-size:cover;
+    transform:rotate(-90deg);
+    position: absolute;
+    left: $left-width - 25px;
+    top:8px;
   }
+
+  // transition:all 1s;
+
+  // &:hover{
+  //   background-color: white;
+  // }
+}
+
+@include keyframes(light) {
+  from {  background-color: $led-color  }
+  to {  background-color: $led-ani-color }
 }
