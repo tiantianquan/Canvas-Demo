@@ -30,8 +30,8 @@ function hackHighDpi(canvas, ctx) {
 
 hackHighDpi(c, ctx)
 
-ctx.fillStyle = '#eee'
-ctx.fillRect(0, 0, c.width, c.height)
+
+
 
 function loop(callback) {
   callback()
@@ -99,21 +99,33 @@ Circle.prototype.linedrew = function() {
   ctx.stroke()
 }
 
-
-ctx.beginPath()
-ctx.arc(window.innerWidth / 2, window.innerHeight / 2, 250, 0, 2 * Math.PI)
-ctx.closePath()
-ctx.fillStyle = 'hsl(200,30%,35%)'
-ctx.fill()
-
 var cc = new Circle({
   outRadii: 250,
   gapAngle: 0.004 * 2 * Math.PI,
   lineWidth: 0.5,
   strokeStyle: 'rgba(255,255,255,.6)',
-  tiltAngle: 0.25*Math.PI,
+  tiltAngle: 0.25 * Math.PI,
   gapWidth: 2,
 })
 
+
+ctx.fillStyle = '#eee'
+ctx.fillRect(0, 0, c.width, c.height)
+
+ctx.beginPath()
+ctx.arc(cc.cx, cc.cy, cc.outRadii, 0, 2 * Math.PI)
+ctx.closePath()
+
+// ctx.fillStyle = 'hsl(200,30%,35%)'
+var gradient = ctx.createLinearGradient(
+  cc.cx, cc.cy - 250,
+  cc.cx, cc.cy + 350
+)
+gradient.addColorStop(0, "hsl(200,30%,35%)")
+gradient.addColorStop(1, "hsl(0,70%,50%)")
+ctx.fillStyle = gradient;
+
+ctx.fill()
+
 cc.linedrew()
-// cc.angeldrew()
+  // cc.angeldrew()
