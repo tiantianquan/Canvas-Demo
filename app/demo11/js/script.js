@@ -1,33 +1,3 @@
-// var renderer = new THREE.WebGLRenderer()
-// renderer.setClearColor('#000'); // black
-// renderer.setSize(window.innerWidth,window.innerHeight)
-// document.body.appendChild(renderer.domElement)
-
-// //建立场景
-// var scene = new THREE.Scene();
-
-// //建立摄像机
-// var camera = new THREE.PerspectiveCamera(45,
-//   c.width / c.height, 0.01, 10000);
-// camera.position.set(4, 0, 10);
-// camera.lookAt(new THREE.Vector3(0, 0, 0));
-// scene.add(camera);
-
-// var boxgeo = new THREE.BoxGeometry(1, 2, 3)
-// var boxmat = new THREE.MeshBasicMaterial({
-//   color: 0xffffff,
-//   wireframe: true,
-//   wireframeLinewidth:1
-// })
-
-// var box = new THREE.Mesh(boxgeo,boxmat);
-// scene.add(box);
-// // var light = new THREE.PointLight(0xffffff, 2, 100);
-// // light.position.set(0, 1.5, 2);
-// // scene.add(light);
-// renderer.render(scene, camera);
-
-
 var camera, scene, renderer
 var geometry, material, mesh, egh
 
@@ -71,14 +41,14 @@ function init() {
   });
 
   mesh = new THREE.Mesh(geometry, material);
-  mesh.visible = false
+  mesh.visible = true
   scene.add(mesh)
   egh = new THREE.EdgesHelper(mesh, 0x000000);
   egh.material.linewidth = 2;
   scene.add(egh)
 
   renderer = new THREE.WebGLRenderer();
-  renderer.setClearColor(0Xffffff)
+  renderer.setClearColor(0Xeeeeee)
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   document.body.appendChild(renderer.domElement);
@@ -87,14 +57,19 @@ function init() {
   var tween = {
     scale: 1.4,
     go: function() {
-      TweenLite.to(mesh.scale, .3, {
-        x: this.scale,
-        y: this.scale,
-        z: this.scale,
-        onComplete:function(){
+      TweenLite.to(mesh.position, .3, {
+        // x: this.scale,
+        // y: this.scale,
+        // z: this.scale,
+        z: 1000,
+        onComplete: function() {
+          // renderer.setClearColor(0xffffff)
+          // egh.material.color = new THREE.Color(0x000000)
           this.reverse()
         },
-        onReverseComplete:function(){
+        onReverseComplete: function() {
+          // renderer.setClearColor(0x000000)
+          // egh.material.color = new THREE.Color(0xffffff)
           this.play()
         }
       })
