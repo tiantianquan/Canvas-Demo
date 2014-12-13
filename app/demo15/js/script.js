@@ -90,7 +90,7 @@ Paper.prototype.drew = function() {
   ctx.shadowBlur = 0;
   ctx.shadowOffsetX = 4;
   ctx.shadowOffsetY = 20;
-  
+
   ctx.fill()
 
 }
@@ -111,7 +111,7 @@ TweenLite.to(p.movePoint, 2, {
   x: window.innerWidth-200
 })
 
-$(c).on('mousemove', function(e) {
+$(c).on('mousemove touchmove', function(e) {
 
   p.movePoint.x = e.pageX
   p.movePoint.y = e.pageY
