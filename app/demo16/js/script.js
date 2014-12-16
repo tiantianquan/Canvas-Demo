@@ -39,7 +39,7 @@ function loop(callback) {
   })
 }
 
-var timeDuration, time
+var timeDuration, time,p
   //半径,半径速度,半径加速度
 var radii, rv, ra
   //角,角速度,角加速度
@@ -60,7 +60,7 @@ function init() {
   ta = 3
 
   time = 0
-  timeDuration = 20
+  timeDuration = 5
 }
 
 function setup(t) {
@@ -71,7 +71,33 @@ function setup(t) {
   y = Math.sin(theta) * radii
 }
 
+function drew(k) {
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+  ctx.moveTo(cx, cy)
+  ctx.beginPath()
+  for (var i = 0; i < 10; i = i + k) {
+    setup(i)
+    ctx.lineTo(cx + x, cy - y)
+  }
+  ctx.strokeStyle = '#222'
+  ctx.stroke()
+}
+
+function drew2(k,p){
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+  ctx.moveTo(cx, cy)
+  ctx.beginPath()
+  for (var i = 0; i < p; i = i + k) {
+    setup(i)
+    ctx.lineTo(cx + x, cy - y)
+  }
+  ctx.strokeStyle = '#222'
+  ctx.stroke()
+}
+
 init()
+
+
 
 TweenLite.to(window, timeDuration, {
   time: timeDuration,
@@ -88,15 +114,22 @@ TweenLite.to(window, timeDuration, {
   }
 })
 
-function drew(k) {
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-  ctx.moveTo(cx, cy)
-  ctx.beginPath()
-  for (var i = 0; i < 10; i = i + k) {
-    setup(i)
-    ctx.lineTo(cx + x, cy - y)
-  }
-  ctx.strokeStyle = '#222'
-  ctx.stroke()
-}
 
+// TweenLite.to(window, timeDuration, {
+//   time: timeDuration,
+//   onUpdate: function() {
+
+//     p = this._time/2
+    
+//   },
+//   onComplete:function(){
+//     this.reverse()
+//   },
+//   onReverseComplete:function(){
+//     this.play()
+//   }
+// })
+
+// loop(function(){
+//   drew2(0.001,p)
+// })
