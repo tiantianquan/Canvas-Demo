@@ -80,6 +80,11 @@ Box.prototype.scale = function(times, baseOnLast) {
 
   return this.translate(m, baseOnLast)
 }
+Box.prototype.default = function() {
+  this.scale(1).rotate(0)
+  this.isTrans = false
+  this._tween.kill()
+}
 
 Box.prototype.getRealXY = function() {
   var that = this
@@ -96,7 +101,7 @@ Box.prototype.getRealXY = function() {
 
 Box.prototype.tween = function(opt) {
   var that = this
-  return TweenLite.to(this, opt.duration, {
+  this._tween = TweenLite.to(this, opt.duration, {
     delay: opt.delay,
     _rotate: opt.rotate || this._rotate,
     _scale: opt.scale === 0 ? 0 : opt.scale === undefined ? this._scale : opt.scale,
@@ -129,27 +134,10 @@ var Rect = function(opt) {
   this.points = opt.points
   this.fillStyle = opt.fillStyle
 
-  function clone(origin, copy) {
-    for (var i in origin) {
-      if (typeof(origin[i]) !== 'object') {
-        // Object.defineProperty(copy, i, {
-        //   get: function() {
-        //     return this[i]
-        //   },
-        //   set: function(val) {
-        //     this[i] = val
-        //   }
-        // })
-        copy[i]=origin[i]
-      } else {
-        clone(origin[i], copy[i])
-      }
-    }
-  }
-  var originPoints = this.originPoints =  this.points 
+  var originPoints = this.originPoints = this.points
+    //TODO:clone
+  this.originPoints = JSON.parse(JSON.stringify(this.points));
 
-  clone(this.points, originPoints)
-  console.log(originPoints)
 }
 
 Rect.prototype.drew = function() {
@@ -253,63 +241,32 @@ function setup() {
     if (index === 0) {
       TweenLite.to(r.points[1], delay / 2, {
         x: 0,
-        onComplete: function() {
-          // r.points[1].x = windowL / 2
-        }
       })
     }
     if (index === 1) {
       TweenLite.to(r.points[0], delay / 2, {
         x: windowL,
-        onComplete: function() {
-          // r.points[0].x = windowL / 2
-        }
       })
     }
     if (index === 2) {
       TweenLite.to(r.points[1], delay / 2, {
         delay: delay / 2,
         y: 0,
-        onComplete: function() {
-          // r.points[1].y = r.originPoints[1].y
-        }
       })
     }
     if (index === 3) {
       TweenLite.to(r.points[0], delay / 2, {
         delay: delay / 2,
         y: windowL,
-        onComplete: function() {
-          // r.points[0].y = r.originPoints[0].y
-        }
       })
     }
   })
 
   bigBox.tween({
     delay: delay,
-    rotate: Math.PI,
+    rotate: a.rotate1,
     scale: 0,
     duration: dur,
-    onComplete: function() {
-      bigBox.scale(1).rotate(0)
-      bigBox.isTrans = false
-
-      var that = this
-      bigBox.tween({
-        delay: delay,
-        rotate: -Math.PI,
-        scale: 0,
-        duration: dur,
-        onComplete: function() {
-          bigBox.scale(1).rotate(0)
-          bigBox.isTrans = false
-          that.restart({
-            delay: delay
-          })
-        }
-      })
-    }
   })
 
   boxes.forEach(function(b) {
@@ -317,42 +274,38 @@ function setup() {
       go: function() {
         b.tween({
           delay: delay,
-          rotate: 2 * Math.PI,
+          rotate: a.rotate2,
           scale: 0,
           duration: dur,
-          onComplete: function() {
-            b.scale(1).rotate(0)
-            b.isTrans = false
-            b.fillStyle = '#000'
-            tween.rego()
-          }
         })
       },
-      rego: function() {
-        b.tween({
-          delay: delay,
-          rotate: -2 * Math.PI,
-          scale: 0,
-          duration: dur,
-          onComplete: function() {
-            b.scale(1).rotate(0)
-            b.isTrans = false
-            b.fillStyle = '#fff'
-            tween.go()
-          }
-        })
-      }
     }
 
     tween.go()
   })
+}
 
+function boot(opt) {
+  bigBox.default()
+  boxes.forEach(function(b) {
+    b.default()
+    b.fillStyle = opt.color
+  })
 
+  rects.forEach(function(r) {
+    r.fillStyle = opt.color
+    r.points = JSON.parse(JSON.stringify(r.originPoints));
+  })
+}
 
+var a = {
+  fillStyle: '#222',
+  rotate1: Math.PI,
+  rotate2: 2 * Math.PI
 }
 
 function drew() {
-  ctx.fillStyle = '#222'
+  ctx.fillStyle = a.fillStyle
   ctx.fillRect(0, 0, windowL, windowL)
 
   rects.forEach(function(r) {
@@ -371,7 +324,31 @@ setTimeout(function() {
   init()
   setup()
 
+  var t = true
+  setInterval(function() {
+    if (t) {
+      boot({
+        color: '#222',
+      })
+      a.fillStyle = '#fff'
+      a.rotate1 = -a.rotate1
+      a.rotate2 = -a.rotate2
+      t = false
+    } else {
+      boot({
+        color: '#fff',
+      })
+      a.fillStyle = '#222'
+      a.rotate1 = -a.rotate1
+      a.rotate2 = -a.rotate2
+      t = true
+    }
+    setup()
+
+  }, 4000)
+
   util.loop(function() {
+
     drew()
   })
 }, 1000)
