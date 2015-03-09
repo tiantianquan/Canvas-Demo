@@ -258,22 +258,22 @@ function test2() {
 }
 
 function test3() {
-    for (var i = 0; i < 30; i++) {
+  for (var i = 0; i < 30; i++) {
 
-      var cc = new Circle({
-        radii: 5 + i * i * i / 80,
-        cubeNum: i * 3,
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2,
-        cubeOpt: {
-          fillStyle: '#000',
-          rotate: 0,
-          scale: 1,
-          long: 3
-        }
-      })
-      cc.drew()
-    }
+    var cc = new Circle({
+      radii: 5 + i * i * i / 80,
+      cubeNum: i * 3,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      cubeOpt: {
+        fillStyle: '#000',
+        rotate: 0,
+        scale: 1,
+        long: i*0.1
+      }
+    })
+    cc.drew()
+  }
 
 }
 
