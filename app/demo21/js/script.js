@@ -79,6 +79,7 @@ Cube.prototype.getPos = function() {
   }
 }
 
+
 Cube.prototype.drew = function() {
   this.getPos()
   ctx.beginPath()
