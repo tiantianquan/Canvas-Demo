@@ -23,6 +23,7 @@ var Circle = function(opt) {
   this.radii = opt.radii
   this.cubeNum = opt.cubeNum
   this.cubeOpt = opt.cubeOpt
+  this.startPI = opt.startPI || 0
   this.x = opt.x
   this.y = opt.y
 }
@@ -32,8 +33,8 @@ Circle.prototype.getCubePos = function() {
   var cubePos = this.cubePos = []
 
   for (var i = 1; i <= this.cubeNum; i++) {
-    var cubeX = this.x + Math.cos(incPI * i) * this.radii
-    var cubeY = this.y - Math.sin(incPI * i) * this.radii
+    var cubeX = this.x + Math.cos(this.startPI + incPI * i) * this.radii
+    var cubeY = this.y - Math.sin(this.startPI + incPI * i) * this.radii
 
     cubePos.push([cubeX, cubeY])
   }
@@ -263,13 +264,14 @@ function test3() {
     var cc = new Circle({
       radii: 5 + i * i * i / 80,
       cubeNum: i * 3,
+      startPI: i,
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
       cubeOpt: {
         fillStyle: '#000',
         rotate: 0,
         scale: 1,
-        long: i*0.1
+        long: i * 0.1
       }
     })
     cc.drew()
