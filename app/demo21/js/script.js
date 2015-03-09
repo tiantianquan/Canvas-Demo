@@ -42,60 +42,182 @@ Circle.prototype.getCubePos = function() {
 Circle.prototype.drew = function() {
   this.getCubePos()
 
-  ctx.fillStyle = '#000'
   var that = this
-  this.cubePos.forEach(function(c) {
-    var cube = new Cube({
-      fillColor: that.cubeOpt.fillColor,
-      lineColor: that.cubeOpt.lineColor,
-      lineWidth: that.cubeOpt.lineWith,
-      long: that.cubeOpt.long,
-      x: c[0],
-      y: c[1]
-    })
+  this.cubePos.forEach(function(c, i, arr) {
+    that.cubeOpt.x = that.cubeOpt.cx = c[0]
+    that.cubeOpt.y = that.cubeOpt.cy = c[1]
+
+    that.cubeOpt.rotate = 2 * Math.PI / (arr.length) * i
+    var cube = new Box(that.cubeOpt)
+
     cube.drew()
   })
 }
 
-var Cube = function(opt) {
+// var Cube = function(opt) {
+//   var opt = opt || {}
+//   this.long = opt.long
+//   this.fillColor = opt.fillColor
+//   this.lineColor = opt.lineColor
+//   this.lineWidth = opt.lineWidth
+//   this.x = opt.x
+//   this.y = opt.y
+// }
+
+// Cube.prototype.getPos = function() {
+//   var pos = this.pos = []
+//   var firPI = Math.PI / 4
+//   var incPI = Math.PI / 2
+//   for (var i = 0; i <= 3; i++) {
+//     var thePI = firPI + incPI * i
+//     var x = this.x + Math.cos(thePI) * this.long / Math.sqrt(2)
+//     var y = this.y - Math.sin(thePI) * this.long / Math.sqrt(2)
+//     pos.push([x, y])
+//   }
+// }
+
+
+// Cube.prototype.drew = function() {
+//   this.getPos()
+//   ctx.beginPath()
+//   this.pos.forEach(function(p, i) {
+//     if (i === 0) ctx.moveTo(p[0], p[1])
+//     else ctx.lineTo(p[0], p[1])
+//   })
+//   ctx.closePath()
+//   ctx.fillStyle = this.fillColor || undefined
+//   ctx.lineWidth = this.lineWidth
+//   ctx.strokeStyle = this.lineColor || undefined
+//   ctx.fill()
+//   ctx.stroke()
+// }
+
+
+var Box = function(opt) {
   var opt = opt || {}
-  this.long = opt.long
-  this.fillColor = opt.fillColor
-  this.lineColor = opt.lineColor
+  var cx = this.cx = opt.cx
+  var cy = this.cy = opt.cy
+  var long = this.long = opt.long
+  this.fillStyle = opt.fillStyle
+  this.strokeStyle = opt.strokeStyle
   this.lineWidth = opt.lineWidth
-  this.x = opt.x
-  this.y = opt.y
+  this._rotate = opt.rotate || 0
+  this._scale = opt.scale === 0 ? 0 : opt.scale === undefined ? 1 : opt.scale
+
+  this.isTrans = false
+
+  this._points = [
+    [-long / 2, long / 2],
+    [long / 2, long / 2],
+    [long / 2, -long / 2],
+    [-long / 2, -long / 2]
+  ]
+
+  this.points = util.copyArray(this._points)
+
+  this.getRealXY()
+
+  this.rotate(this._rotate).scale(this._scale)
 }
 
-Cube.prototype.getPos = function() {
-  var pos = this.pos = []
-  var firPI = Math.PI / 4
-  var incPI = Math.PI / 2
-  for (var i = 0; i <= 3; i++) {
-    var thePI = firPI + incPI * i
-    var x = this.x + Math.cos(thePI) * this.long / Math.sqrt(2)
-    var y = this.y - Math.sin(thePI) * this.long / Math.sqrt(2)
-    pos.push([x, y])
-  }
-}
+Box.prototype.translate = function(m, baseOnLast) {
+  if (this.isTrans === true)
+    baseOnLast = true
 
+  if (baseOnLast !== true)
+    this.points = util.copyArray(this._points)
 
-Cube.prototype.drew = function() {
-  this.getPos()
-  ctx.beginPath()
-  this.pos.forEach(function(p, i) {
-    if (i === 0) ctx.moveTo(p[0], p[1])
-    else ctx.lineTo(p[0], p[1])
+  this.points.forEach(function(p) {
+    var x = p[0]
+    var y = p[1]
+
+    p[0] = m[0][0] * x + m[0][1] * y
+    p[1] = m[1][0] * x + m[1][1] * y
+    return p
   })
+
+  this.isTrans = true
+  this.getRealXY()
+  return this
+}
+
+Box.prototype.rotate = function(theta, baseOnLast) {
+  if (baseOnLast === true)
+    this._rotate += theta
+  else
+    this._rotate = theta
+
+  var cos = Math.cos
+  var sin = Math.sin
+  var m = [
+    [cos(theta), -sin(theta)],
+    [sin(theta), cos(theta)]
+  ]
+
+  return this.translate(m, baseOnLast)
+}
+
+Box.prototype.scale = function(times, baseOnLast) {
+  if (baseOnLast === true)
+    this._scale += times
+  else
+    this._scale = times
+
+  var m = [
+    [times, 0],
+    [0, times]
+  ]
+
+  return this.translate(m, baseOnLast)
+}
+Box.prototype.default = function() {
+  this.scale(1).rotate(0)
+  this.isTrans = false
+  this._tween.kill()
+}
+
+Box.prototype.getRealXY = function() {
+  var that = this
+
+  this.realPoints = util.copyArray(this.points)
+  this.realPoints.forEach(function(p) {
+    var x = p[0]
+    var y = p[1]
+    p[0] = that.cx + p[0]
+    p[1] = that.cy - p[1]
+    return p
+  })
+}
+
+Box.prototype.tween = function(opt) {
+  var that = this
+  this._tween = TweenLite.to(this, opt.duration, {
+    delay: opt.delay,
+    _rotate: opt.rotate || this._rotate,
+    _scale: opt.scale === 0 ? 0 : opt.scale === undefined ? this._scale : opt.scale,
+    ease: Quad.easeInOut,
+    onComplete: opt.onComplete,
+    onUpdate: function() {
+      that.rotate(that._rotate).scale(that._scale)
+      that.isTrans = false
+    }
+  })
+}
+
+Box.prototype.drew = function() {
+  this.getRealXY()
+  ctx.beginPath()
+  for (var i = 0; i < this.realPoints.length; i++) {
+    if (i === 0)
+      ctx.moveTo(this.realPoints[0][0], this.realPoints[0][1])
+    else
+      ctx.lineTo(this.realPoints[i][0], this.realPoints[i][1])
+  }
   ctx.closePath()
-  ctx.fillStyle = this.fillColor || undefined
-  ctx.lineWidth = this.lineWidth
-  ctx.strokeStyle = this.lineColor || undefined
+  ctx.fillStyle = this.fillStyle
+  ctx.strokeStyle = this.strokeStyle
   ctx.fill()
-  ctx.stroke()
-
-  console.log(this.long)
-
+  this.isTrans = false
 }
 
 
@@ -117,4 +239,51 @@ function test1() {
 }
 
 
-test1()
+function test2() {
+  for (var i = 0; i < 20; i++) {
+    var cc = new Circle({
+      radii: i * i * i / 20,
+      cubeNum: 50,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      cubeOpt: {
+        fillStyle: '#000',
+        rotate: 0,
+        scale: 1,
+        long: 0.1 + i * 0.1
+      }
+    })
+    cc.drew()
+  }
+}
+
+function test3() {
+    for (var i = 0; i < 30; i++) {
+
+      var cc = new Circle({
+        radii: 5 + i * i * i / 80,
+        cubeNum: i * 3,
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        cubeOpt: {
+          fillStyle: '#000',
+          rotate: 0,
+          scale: 1,
+          long: 3
+        }
+      })
+      cc.drew()
+    }
+
+}
+
+
+function main() {
+  // test1()
+
+  // test2()
+
+  test3()
+}
+
+main()
