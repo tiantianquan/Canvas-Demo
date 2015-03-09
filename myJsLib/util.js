@@ -42,3 +42,21 @@ util.copyArray = function(arr) {
   }
   return copy
 }
+
+util.random = function() {
+  function _random(min, max) {
+    var dis = max - min
+    var result = min + dis * Math.random()
+    return result
+  }
+
+  //一个区间
+  if (typeof(arguments[0]) === 'number') {
+    return _random(arguments[0], arguments[1])
+  }
+  //多个区间
+  else {
+    var target = Math.round(_random(0, arguments.length-1))
+    return _random(arguments[target][0],arguments[target][1])
+  }
+}

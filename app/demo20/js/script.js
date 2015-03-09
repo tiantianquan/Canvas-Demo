@@ -1,7 +1,9 @@
 var c = document.querySelector('#c')
 var ctx = c.getContext('2d')
-c.width = window.innerWidth
-c.height = window.innerHeight
+var cw = window.innerWidth
+var ch = window.innerHeight
+c.width = cw
+c.height = ch
 
 util.hackHighDpi(c, ctx)
 
@@ -104,8 +106,8 @@ Box.prototype.getRealXY = function() {
 Box.prototype.tween = function(opt) {
   var that = this
   this._tween = TweenLite.to(this, opt.duration, {
-    cx:opt.cx,
-    cy:opt.cy,
+    cx: opt.cx,
+    cy: opt.cy,
     delay: opt.delay,
     _rotate: opt.rotate || this._rotate,
     _scale: opt.scale === 0 ? 0 : opt.scale === undefined ? this._scale : opt.scale,
@@ -135,72 +137,26 @@ Box.prototype.drew = function() {
 }
 
 var boxes = []
-for (var i = 0; i < 500; i++) {
-  // var randomH = util.random(0, window.innerHeight)
-  // var randomW = util.random(0, window.innerWidth)
 
-  var hh = window.innerHeight / 2
-  var ww = window.innerWidth / 2
-  var ll = 200
-  var randomH, randomW
-
-  if (i % 2 === 0) {
-    randomW = util.random(0, window.innerWidth)
-    randomH = util.random([0, hh - ll], [hh + ll, window.innerHeight])
-  } else {
-    randomH = util.random(0, window.innerHeight)
-    randomW = util.random([0, ww - ll], [ww + ll, window.innerWidth])
-  }
-
-
-
+for (var i = 0; i < 100; i++) {
   var b = new Box({
-    cx: randomW,
-    cy: randomH,
+    cx: cw / 2 + i,
+    cy: ch / 2 + i,
+    long: 100,
+    fillStyle: 'hsla(0,0%,'+ (100-i)+'%,'+ (100-i)/100 +')',
     rotate: 0,
-    scale: 1,
-    fillStyle: 'hsla(0,0%,90%,.1)',
-    long: 100
-      // points: [
-      //   [100, 100],
-      //   [200, 100],
-      //   [200, 200],
-      //   [100, 200]
-      // ]
+    scale: 1
   })
-
   boxes.push(b)
-
 }
 
 function main() {
-  boxes.forEach(function(b) {
-    b.tween({
-      cx:window.innerWidth/2,
-      cy:window.innerHeight/2,
-      delay: 1,
-      // rotate: Math.PI * 2,
-      scale: 1,
-      duration: 2,
-    })
-  })
+  ctx.fillStyle = '#222'
+  ctx.fillRect(0, 0, cw, ch)
+  b.drew()
 
-  util.loop(function() {
-    ctx.fillStyle = '#222'
-    ctx.fillRect(0,0,window.innerWidth,window.innerHeight)
-    // ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-
-    boxes.forEach(function(b) {
-      b.drew()
-    })
+  boxes.forEach(function(b){
+    b.drew()
   })
 }
-
 main()
-
-//-------------------
-// ctx.fillStyle = '#222'
-// ctx.fillRect(0,0,window.innerWidth,window.innerHeight)
-// boxes.forEach(function(b) {
-//   b.drew()
-// })
