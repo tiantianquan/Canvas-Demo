@@ -48,6 +48,9 @@ Circle.prototype.drew = function() {
     that.cubeOpt.x = that.cubeOpt.cx = c[0]
     that.cubeOpt.y = that.cubeOpt.cy = c[1]
 
+
+    // that.cubeOpt.fillStyle = '#' + i * 22
+
     that.cubeOpt.rotate = 2 * Math.PI / (arr.length) * i
     var cube = new Box(that.cubeOpt)
 
@@ -279,13 +282,35 @@ function test3() {
 
 }
 
+function test4() {
+  for (var i = 1; i <= 5; i++) {
+
+    var cc = new Circle({
+      radii: 40*i,
+      cubeNum: 20,
+      // startPI: 0,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      cubeOpt: {
+        fillStyle: '#444',
+        rotate: 0,
+        scale: 0.3*i,
+        long: 25
+      }
+    })
+    cc.drew()
+  }
+}
+
 
 function main() {
   // test1()
 
   // test2()
 
-  test3()
+  // test3()
+
+  test4()
 }
 
 main()
