@@ -44,17 +44,19 @@ Circle.prototype.drew = function(cubeFun) {
   this.getCubePos()
 
   cubeFun(this.cubePos)
+}
 
-  // this.cubePos.forEach(function(c, i, arr) {
-  //   that.cubeOpt.x = that.cubeOpt.cx = c[0]
-  //   that.cubeOpt.y = that.cubeOpt.cy = c[1]
-
-
-  //   that.cubeOpt.rotate = 2 * Math.PI / (arr.length) * i
-  //   var cube = new Box(that.cubeOpt)
-
-  //   cube.drew()
-  // })
+Circle.prototype.tween = function(opt) {
+  var that = this
+  this._tween = TweenLite.to(this, opt.duration, {
+    delay: opt.delay,
+    startPI: opt.startPI,
+    ease: Quad.easeInOut,
+    onComplete: opt.onComplete,
+    onUpdate: function() {
+      // console.log(that)
+    }
+  })
 }
 
 // var Cube = function(opt) {
@@ -305,29 +307,11 @@ function test3() {
 }
 
 function test4() {
-  // for (var i = 1; i <= 5; i++) {
-
-  //   var cc = new Circle({
-  //     radii: 40 * i,
-  //     cubeNum: 20,
-  //     // startPI: 0,
-  //     x: window.innerWidth / 2,
-  //     y: window.innerHeight / 2,
-  //     cubeOpt: {
-  //       fillStyle: '#444',
-  //       rotate: 0,
-  //       scale: 0.3 * i,
-  //       long: 25
-  //     }
-  //   })
-  //   cc.drew()
-  // }
-
   for (var i = 0; i < 5; i++) {
 
     var cc = new Circle({
       radii: 40 * i,
-      cubeNum: 20,
+      cubeNum:  i===0?1:20,
       // startPI: i,
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
@@ -336,13 +320,13 @@ function test4() {
       cubePos.forEach(function(c, num, arr) {
         var cubeOpt = {
           fillStyle: '#444',
-          scale: 0.3 * i,
+          scale: 0.3 * (i===0?1:i),
           long: 25,
         }
         cubeOpt.x = cubeOpt.cx = c[0]
         cubeOpt.y = cubeOpt.cy = c[1]
 
-        cubeOpt.rotate = cc.startPI + cc.incPI * num +Math.PI/4
+        cubeOpt.rotate = cc.startPI + cc.incPI * num + Math.PI / 4
         var cube = new Box(cubeOpt)
 
         cube.drew()
@@ -350,6 +334,118 @@ function test4() {
     })
   }
 }
+
+function test5() {
+  for (var i = 0; i < 30; i++) {
+
+    var cc = new Circle({
+      radii: 3 + i * i / 3,
+      cubeNum: 80,
+      // startPI: i,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    })
+    cc.drew(function(cubePos) {
+      cubePos.forEach(function(c, num, arr) {
+        var cubeOpt = {
+          fillStyle: '#444',
+          scale: i * 0.05,
+          long: 10,
+        }
+        cubeOpt.x = cubeOpt.cx = c[0]
+        cubeOpt.y = cubeOpt.cy = c[1]
+
+        cubeOpt.rotate = cc.startPI + cc.incPI * num + Math.PI / 4
+        var cube = new Box(cubeOpt)
+
+        cube.drew()
+      })
+    })
+  }
+}
+
+function test6() {
+  for (var i = 0; i < 30; i++) {
+
+    var cc = new Circle({
+      radii: 3 + i * i / 3,
+      cubeNum: i * 3,
+      // startPI: i,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    })
+    cc.drew(function(cubePos) {
+      cubePos.forEach(function(c, num, arr) {
+        var cubeOpt = {
+          fillStyle: '#444',
+          scale: i * 0.05,
+          long: 10,
+        }
+        cubeOpt.x = cubeOpt.cx = c[0]
+        cubeOpt.y = cubeOpt.cy = c[1]
+
+        cubeOpt.rotate = cc.startPI + cc.incPI * num + Math.PI / 4
+        var cube = new Box(cubeOpt)
+
+        cube.drew()
+      })
+    })
+  }
+}
+
+function test7() {
+  var circles = []
+
+  for (var i = 0; i < 30; i++) {
+
+    var cc = new Circle({
+      radii: 3 + i * i / 3,
+      cubeNum: 80,
+      startPI: 0,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    })
+
+
+    circles.push(cc)
+  }
+
+  circles.forEach(function(cc,i) {
+    cc.tween({
+      duration: 5,
+      delay: 0.1*i,
+      startPI: Math.PI
+    })
+  })
+
+  loop(function() {
+    ctx.fillStyle = '#eee'
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
+
+    circles.forEach(function(cc,cl) {
+      cc.drew(function(cubePos) {
+        cubePos.forEach(function(c, num, arr) {
+          var cubeOpt = {
+            fillStyle: '#444',
+            scale: cl* 0.05,
+            long: 10,
+          }
+          cubeOpt.x = cubeOpt.cx = c[0]
+          cubeOpt.y = cubeOpt.cy = c[1]
+
+          cubeOpt.rotate = cc.startPI + cc.incPI * num + Math.PI / 4
+          var cube = new Box(cubeOpt)
+          cube.drew()
+        })
+      })
+    })
+
+  })
+}
+
+
+
+
 
 
 function main() {
@@ -360,6 +456,12 @@ function main() {
   // test3()
 
   test4()
+
+  // test5()
+
+  // test6()
+
+  // test7()
 }
 
 main()
