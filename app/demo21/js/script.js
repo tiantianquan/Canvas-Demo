@@ -29,10 +29,10 @@ var Circle = function(opt) {
 }
 
 Circle.prototype.getCubePos = function() {
-  var incPI = 2 * Math.PI / this.cubeNum
+  var incPI = this.incPI = 2 * Math.PI / this.cubeNum
   var cubePos = this.cubePos = []
 
-  for (var i = 1; i <= this.cubeNum; i++) {
+  for (var i = 0; i < this.cubeNum; i++) {
     var cubeX = this.x + Math.cos(this.startPI + incPI * i) * this.radii
     var cubeY = this.y - Math.sin(this.startPI + incPI * i) * this.radii
 
@@ -40,22 +40,21 @@ Circle.prototype.getCubePos = function() {
   }
 }
 
-Circle.prototype.drew = function() {
+Circle.prototype.drew = function(cubeFun) {
   this.getCubePos()
 
-  var that = this
-  this.cubePos.forEach(function(c, i, arr) {
-    that.cubeOpt.x = that.cubeOpt.cx = c[0]
-    that.cubeOpt.y = that.cubeOpt.cy = c[1]
+  cubeFun(this.cubePos)
+
+  // this.cubePos.forEach(function(c, i, arr) {
+  //   that.cubeOpt.x = that.cubeOpt.cx = c[0]
+  //   that.cubeOpt.y = that.cubeOpt.cy = c[1]
 
 
-    // that.cubeOpt.fillStyle = '#' + i * 22
+  //   that.cubeOpt.rotate = 2 * Math.PI / (arr.length) * i
+  //   var cube = new Box(that.cubeOpt)
 
-    that.cubeOpt.rotate = 2 * Math.PI / (arr.length) * i
-    var cube = new Box(that.cubeOpt)
-
-    cube.drew()
-  })
+  //   cube.drew()
+  // })
 }
 
 // var Cube = function(opt) {
@@ -225,43 +224,25 @@ Box.prototype.drew = function() {
 }
 
 
-function test1() {
-  for (var i = 0; i < 20; i++) {
-    var cc = new Circle({
-      radii: i * i * i / 20,
-      cubeNum: 50,
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      cubeOpt: {
-        long: 0.1 + i * 0.03,
-        fillColor: '#000',
-      }
-    })
+// function test1() {
+//   for (var i = 0; i < 20; i++) {
+//     var cc = new Circle({
+//       radii: i * i * i / 20,
+//       cubeNum: 50,
+//       x: window.innerWidth / 2,
+//       y: window.innerHeight / 2,
+//       cubeOpt: {
+//         long: 0.1 + i * 0.03,
+//         fillColor: '#000',
+//       }
+//     })
 
-    cc.drew()
-  }
-}
+//     cc.drew()
+//   }
+// }
 
 
 function test2() {
-  for (var i = 0; i < 20; i++) {
-    var cc = new Circle({
-      radii: i * i * i / 20,
-      cubeNum: 50,
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      cubeOpt: {
-        fillStyle: '#000',
-        rotate: 0,
-        scale: 1,
-        long: 0.1 + i * 0.1
-      }
-    })
-    cc.drew()
-  }
-}
-
-function test3() {
   for (var i = 0; i < 30; i++) {
 
     var cc = new Circle({
@@ -270,35 +251,103 @@ function test3() {
       startPI: i,
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
-      cubeOpt: {
-        fillStyle: '#000',
-        rotate: 0,
-        scale: 1,
-        long: i * 0.1
-      }
     })
-    cc.drew()
+    cc.drew(function(cubePos) {
+      cubePos.forEach(function(c, num, arr) {
+        var cubeOpt = {
+          fillStyle: '#000',
+          rotate: 0,
+          scale: 1,
+          long: i * 0.1
+        }
+        cubeOpt.x = cubeOpt.cx = c[0]
+        cubeOpt.y = cubeOpt.cy = c[1]
+
+
+        cubeOpt.rotate = cc.startPI + cc.incPI * num
+        var cube = new Box(cubeOpt)
+
+        cube.drew()
+      })
+    })
+  }
+}
+
+function test3() {
+  for (var i = 0; i < 30; i++) {
+
+    var cc = new Circle({
+      radii: 3 + i * i * i / 80,
+      cubeNum: i * 3,
+      startPI: i,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    })
+    cc.drew(function(cubePos) {
+      cubePos.forEach(function(c, num, arr) {
+        var cubeOpt = {
+          fillStyle: '#000',
+          scale: 1,
+          long: num * 0.1
+        }
+        cubeOpt.x = cubeOpt.cx = c[0]
+        cubeOpt.y = cubeOpt.cy = c[1]
+
+        //单面对准圆心
+        cubeOpt.rotate = cc.startPI + cc.incPI * num
+        var cube = new Box(cubeOpt)
+
+        cube.drew()
+      })
+    })
   }
 
 }
 
 function test4() {
-  for (var i = 1; i <= 5; i++) {
+  // for (var i = 1; i <= 5; i++) {
+
+  //   var cc = new Circle({
+  //     radii: 40 * i,
+  //     cubeNum: 20,
+  //     // startPI: 0,
+  //     x: window.innerWidth / 2,
+  //     y: window.innerHeight / 2,
+  //     cubeOpt: {
+  //       fillStyle: '#444',
+  //       rotate: 0,
+  //       scale: 0.3 * i,
+  //       long: 25
+  //     }
+  //   })
+  //   cc.drew()
+  // }
+
+  for (var i = 0; i < 5; i++) {
 
     var cc = new Circle({
-      radii: 40*i,
+      radii: 40 * i,
       cubeNum: 20,
-      // startPI: 0,
+      // startPI: i,
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
-      cubeOpt: {
-        fillStyle: '#444',
-        rotate: 0,
-        scale: 0.3*i,
-        long: 25
-      }
     })
-    cc.drew()
+    cc.drew(function(cubePos) {
+      cubePos.forEach(function(c, num, arr) {
+        var cubeOpt = {
+          fillStyle: '#444',
+          scale: 0.3 * i,
+          long: 25,
+        }
+        cubeOpt.x = cubeOpt.cx = c[0]
+        cubeOpt.y = cubeOpt.cy = c[1]
+
+        cubeOpt.rotate = cc.startPI + cc.incPI * num +Math.PI/4
+        var cube = new Box(cubeOpt)
+
+        cube.drew()
+      })
+    })
   }
 }
 
