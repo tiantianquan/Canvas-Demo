@@ -60,3 +60,14 @@ util.random = function() {
     return _random(arguments[target][0],arguments[target][1])
   }
 }
+
+util.getTime = function(callback) {
+  var t = Date.now()
+  callback()
+  t = Date.now() - t
+  var timeDom = document.createElement('DIV')
+  timeDom.innerText = t
+  timeDom.style.position = 'absolute'
+  var b = document.getElementsByTagName('BODY')
+  b[0].appendChild(timeDom)
+}
