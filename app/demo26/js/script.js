@@ -16,6 +16,7 @@ ctx.fillRect(0, 0, c.width, c.height)
 //------------------------------
 
 var Point = function() {
+  this.strokeStyle = '#444'
   this.getPoint()
     //最近的四个点
   this.nearPoint = []
@@ -30,8 +31,20 @@ Point.prototype.getLength = function(p1, p2) {
   return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
+Point.prototype.move = function() {
+  var that = this
+  TweenLite.to(this, 10, {
+    x: util.random(0, window.innerWidth),
+    y: util.random(0, window.innerHeight),
+    ease: Linear.easeNone,
+    onComplete: function() {
+      that.move()
+    }
+  })
+}
+
 Point.prototype.draw = function() {
-  ctx.strokeStyle = '#444'
+  ctx.strokeStyle = this.strokeStyle
   ctx.lineWidth = 0.3
   ctx.beginPath()
   for (var i = 0; i < this.nearPoint.length; i++) {
@@ -40,8 +53,10 @@ Point.prototype.draw = function() {
   }
   ctx.closePath()
   ctx.stroke()
-    // ctx.fillStyle = 'red'
-    // ctx.fillRect(this.x, this.y, 5, 5)
+
+  var l = 3
+  ctx.fillStyle = '#777'
+  ctx.fillRect(this.x-l/2, this.y-l/2, l, l)
 
 }
 
@@ -54,39 +69,23 @@ function main() {
     points.push(point)
   }
 
-  // points.forEach(function(p, i, arr) {
-  //   var lengthList = []
-  //   for (var n = 1; n < arr.length - i; n++) {
-  //     var l = p.getLength(p, arr[i + n])
-  //     lengthList.push([l, arr[i + n]])
-  //   }
-
-  //   lengthList.sort(function(a, b) {
-  //     return a[0] - b[0]
-  //   })
-
-  //   lengthList.forEach(function(l) {
-  //     p.nearPoint.push(l[1])
-  //   })
-
-  //   p.draw()
-  // })
-
   points.forEach(function(p, i, arr) {
     for (var n = 1; n < arr.length - i; n++) {
       p.nearPoint.push(arr[i + n])
     }
+
+    p.move()
   })
 
   util.loop(function() {
     ctx.fillStyle = '#eee'
     ctx.fillRect(0, 0, c.width, c.height)
-    
-    points.forEach(function(p, i, arr) {
-      p.x = util.random(0, window.innerWidth)
-      p.y = util.random(0, window.innerHeight)
 
-    })
+    // points.forEach(function(p, i, arr) {
+    //   p.x = util.random(0, window.innerWidth)
+    //   p.y = util.random(0, window.innerHeight)
+
+    // })
 
     points.forEach(function(p) {
       p.draw()
@@ -95,4 +94,6 @@ function main() {
 
 }
 
-// main()
+
+
+main()
