@@ -20,6 +20,7 @@
     "hidpi-canvas": "~1.0.9",
     "p5js": "~0.3.12",
     "three.js": "*",
-    "threejs": "*"
+    "threejs": "*",
+    "tinycolor": "~1.1.2"
   }
 }

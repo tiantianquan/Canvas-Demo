@@ -198,26 +198,83 @@ LowPoly.prototype.drawLine = function(isdiagonal) {
   ctx.stroke()
 }
 
-var lowP = new LowPoly({
-  lineStyle: '#000',
-  lineWidth: 0.5,
-  pointStyle: '#000',
-  pointRadii: 2,
-  gap: 50,
-})
+LowPoly.prototype.drawColor = function() {
+  var points = this.points
+  for (var i = 0; i < points.length - 1; i++) {
+    for (var j = 0; j < points[0].length; j++) {
+      var l1 = points[i][j]
+      var l2 = points[i + 1][j]
+      var l3 = points[i][j + 1]
+
+      var r1 = points[i + 1][j]
+      var r2 = points[i + 1][j + 1]
+      var r3 = points[i][j + 1]
 
 
+      var color = tinycolor({
+        h: i*5,
+        s: .5,
+        l: .5
+      })
 
-function draw() {
-  lowP.movePoints(1)
-  lowP.drawPoint()
-  lowP.drawLine(true)
+      function fillPath(f1, f2, f3) {
+        if (f1 != undefined && f2 != undefined && f3 != undefined) {
+          ctx.beginPath()
+          ctx.moveTo(f1.x, f1.y)
+          ctx.lineTo(f2.x, f2.y)
+          ctx.lineTo(f3.x, f3.y)
+          ctx.closePath()
+            // ctx.fillStyle = '#' + (i + 1) * 111112
+          ctx.fillStyle = color.toHexString()
+          ctx.fill()
+        }
+      }
+
+      fillPath(l1, l2, l3)
+      fillPath(r1, r2, r3)
+
+
+    }
+  }
+}
+
+LowPoly.prototype.draw = function(opt) {
+  var opt = opt || {}
+
+  this.movePoints(opt.moveDis)
+
+  if (!!opt.point)
+    this.drawPoint()
+  if (!!opt.line)
+    this.drawLine(true)
+  if (!!opt.color)
+    this.drawColor()
 }
 
 
+function test1() {
+  var lowP = new LowPoly({
+    lineStyle: '#fff',
+    lineWidth: 0.5,
+    pointStyle: '#000',
+    pointRadii: 2,
+    gap: 50,
+  })
 
-c.addEventListener('mousemove', function(e) {
-  ctx.fillStyle = '#eee'
-  ctx.fillRect(0, 0, cw, ch)
-  draw()
-})
+  lowP.draw({
+    moveDis: lowP.gap / 3,
+    color: true,
+  })
+
+  c.addEventListener('mousemove', function(e) {
+    ctx.fillStyle = '#eee'
+    ctx.fillRect(0, 0, cw, ch)
+    lowP.draw({
+      moveDis: 1,
+      color: true,
+      line: true,
+    })
+  })
+}
+
+test1()
