@@ -140,20 +140,42 @@ Box.prototype.draw = function() {
   this.isTrans = false
 }
 
+var startX = 1 / 4 * cw / 2
+var startY = 1 / 4 * cw / 2
 
+var m = 5
+var long = 70
+for (var i = m; i > 0; i--) {
+  for (var j = m; j > 0; j--) {
+    drawBoxes(startX + i * 100, startY + j * 100)
+  }
+}
 
-for (var i = 4; i > 0; i--) {
-  var color1 = tinycolor('hsla(0, 100%, 50%, .1)')
-  color1.toHexString()
-  // color1.setAlpha(0)
-  var box = new Box({
-    fillStyle: 'rgba(0,0,0,.1)' ,
-    cx: cw / 2,
-    cy: ch / 2,
-    rotate: 0,
-    scale: 1,
-    long: 50 * (i + 1)
-  })
-  box.rotate(Math.PI / 4)
-  box.draw()
+for (var i = m-1; i > 0; i--) {
+  for (var j = m-1; j > 0; j--) {
+    drawBoxes(startX + i * 100+.5*long*Math.sqrt(2), startY + j * 100+.5*long*Math.sqrt(2))
+  }
+}
+
+function drawBoxes(x, y) {
+  var m = 7
+  for (var i = m; i > 0; i--) {
+    var color1 = tinycolor({
+      r: 40,
+      g: 116,
+      b: 120,
+      a: .1
+    })
+    var box = new Box({
+      fillStyle: color1.toRgbString(),
+      cx: x,
+      cy: y,
+      rotate: 0,
+      scale: 1,
+      long: long/m * i
+    })
+    box.rotate(Math.PI / 4)
+    box.draw()
+  }
+
 }
