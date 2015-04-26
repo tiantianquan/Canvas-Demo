@@ -1,102 +1,114 @@
-var camera, scene, renderer, light
-var geometry, material, mesh, egh, long
-long = 100
+var c = document.querySelector('#c')
+var ctx = c.getContext('2d')
+var cw = window.innerWidth
+var ch = window.innerHeight
+c.width = cw
+c.height = ch
 
-function init() {
+util.hackHighDpi(c, ctx)
 
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
-  camera.position.z = 800
-  camera.position.x = 1000
-  camera.position.y = 80
-  camera.rotation.y = Math.PI / 2.5
+cw = window.innerWidth
+ch = window.innerHeight
 
-  scene = new THREE.Scene()
+ctx.fillStyle = '#eee'
+ctx.fillRect(0, 0, c.width, c.height)
 
-  light = new THREE.PointLight(0xffffff, 1, 1000);
-  light.position.set(200, 100, 500)
-  scene.add(light)
+//----------------------------------------
 
+var Line = function(opt) {
+  var opt = opt || {}
+  this.x1 = opt.x1
+  this.y1 = opt.y1
+  this.x2 = opt.x2
+  this.y2 = opt.y2
+  this.lineWidth = opt.lineWidth
+  this.strokeStyle = opt.strokeStyle
+}
 
-  geometry = new THREE.BoxGeometry(long, long, long)
-  geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, long / 2, -long / 2))
+Line.prototype.draw = function() {
+  ctx.lineWidth = this.lineWidth
+  ctx.strokeStyle = this.strokeStyle
 
-  material = new THREE.MeshLambertMaterial({
-    color: 0xeeeeee,
-    emissive: 'steelblue'
-  })
+  ctx.beginPath()
+  ctx.moveTo(this.x1, this.y1)
+  ctx.lineTo(this.x2, this.y2)
+  ctx.closePath()
+  ctx.stroke()
+}
 
+var Circle = function(opt) {
+  this.radii = opt.radii
+  this.cx = opt.cx
+  this.cy = opt.cy
+  this.partNum = opt.partNum
+  this.pointList = []
+}
 
-  mesh = new THREE.Mesh(geometry, material);
-  // mesh.visible = false
-  scene.add(mesh)
-
-  egh = new THREE.EdgesHelper(mesh, 0x000000);
-  egh.material.linewidth = 1;
-  // scene.add(egh)
-
-  renderer = new THREE.WebGLRenderer({
-    antialias: true
-  })
-  renderer.setClearColor(0xeeeeee)
-  renderer.setSize(window.innerWidth, window.innerHeight)
-
-
-
-  document.body.appendChild(renderer.domElement);
-
-
-  var tween = {
-    go: function(times) {
-      var i = 1
-      tween.tl1 = function() {
-        TweenLite.to(mesh.rotation, .3, {
-          x: mesh.rotation.x + Math.PI / 2,
-          onComplete: function() {
-            mesh.position.set(0, 0, long * i);
-            mesh.rotation.set(0, 0, 0);
-            i++
-            if (i > times) {
-              // tween.tl2()
-              return
-            } else {
-              this.restart()
-            }
-          },
-          ease: Linear.easeNone,
-        })
-      }
-
-      // tween.tl2 = function() {
-      //   TweenLite.to(mesh.rotation, 5, {
-      //     x: mesh.rotation.x - Math.PI / 2,
-      //     onComplete: function() {
-      //       i--
-      //       mesh.position.set(0, 0, long * i);
-      //       mesh.rotation.set(0, 0, 0);
-      //       if (i <1) {
-      //         tween.tl1()
-      //       } else {
-      //         this.restart()
-      //       }
-      //     },
-      //     ease: Linear.easeNone,
-      //   })
-      // }
-      tween.tl1()
-    }
+Circle.prototype.getPoint = function() {
+  var deltaPI = this.deltaPI = 2 * Math.PI / this.partNum
+  for (var i = 0; i < this.partNum; i++) {
+    var point = {}
+    point.x = this.cx + Math.cos(i * deltaPI) * this.radii
+    point.y = this.cy - Math.sin(i * deltaPI) * this.radii
+    this.pointList.push(point)
   }
+}
 
-  tween.go(10)
+var Graph = function(opt) {
+  this.circle = opt.circle
+  this.long = opt.long
+  this.randomScope = opt.randomScope
+  this.startPointList = []
+  this.endPointList = []
+}
+
+Graph.prototype.getPoint = function() {
+  var cir = this.circle
+  var randomInner = this.randomScope[0]
+  var randomOuter = this.randomScope[1]
+
+
+  cir.getPoint()
+  for (var i = 0; i < cir.pointList.length; i++) {
+    var randomRadii = util.random(cir.radii - randomInner, cir.radii + randomOuter)
+    var startPoint = {}
+    var endPoint = {}
+    startPoint.x = cir.cx + Math.cos(i * cir.deltaPI) * randomRadii
+    startPoint.y = cir.cy - Math.sin(i * cir.deltaPI) * randomRadii
+    endPoint.x = cir.cx + Math.cos(i * cir.deltaPI) * (randomRadii + this.long)
+    endPoint.y = cir.cy - Math.sin(i * cir.deltaPI) * (randomRadii + this.long)
+    this.startPointList.push(startPoint)
+    this.endPointList.push(endPoint)
+  }
+}
+
+Graph.prototype.draw = function() {
+  for (var i = 0; i < this.startPointList.length; i++) {
+    var line = new Line({
+      x1: this.startPointList[i].x,
+      y1: this.startPointList[i].y,
+      x2: this.endPointList[i].x,
+      y2: this.endPointList[i].y,
+      strokeStyle: '#444',
+      lineWidth: 5
+    })
+    line.draw()
+  }
 }
 
 
-function animate() {
+var cir = new Circle({
+  radii: 200,
+  cx: cw / 2,
+  cy: ch / 2,
+  partNum: 1000,
+})
 
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-}
+var graph = new Graph({
+  circle: cir,
+  long: 100,
+  randomScope: [150, 0]
+})
 
-
-
-init()
-animate()
+graph.getPoint()
+graph.draw()
