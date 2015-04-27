@@ -58,6 +58,8 @@ var Graph = function(opt) {
   this.circle = opt.circle
   this.long = opt.long
   this.randomScope = opt.randomScope
+  this.strokeStyle = opt.strokeStyle
+  this.lineWidth = opt.lineWidth
   this.startPointList = []
   this.endPointList = []
 }
@@ -83,14 +85,15 @@ Graph.prototype.getPoint = function() {
 }
 
 Graph.prototype.draw = function() {
+  this.getPoint()
   for (var i = 0; i < this.startPointList.length; i++) {
     var line = new Line({
       x1: this.startPointList[i].x,
       y1: this.startPointList[i].y,
       x2: this.endPointList[i].x,
       y2: this.endPointList[i].y,
-      strokeStyle: '#444',
-      lineWidth: 5
+      strokeStyle: this.strokeStyle,
+      lineWidth: this.lineWidth
     })
     line.draw()
   }
@@ -107,8 +110,10 @@ var cir = new Circle({
 var graph = new Graph({
   circle: cir,
   long: 100,
-  randomScope: [150, 0]
+  randomScope: [120, 0],
+  strokeStyle: '#444',
+  lineWidth: 5
 })
 
-graph.getPoint()
+
 graph.draw()
