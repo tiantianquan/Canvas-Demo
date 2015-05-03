@@ -56,8 +56,8 @@ util.random = function() {
   }
   //多个区间
   else {
-    var target = Math.round(_random(0, arguments.length-1))
-    return _random(arguments[target][0],arguments[target][1])
+    var target = Math.round(_random(0, arguments.length - 1))
+    return _random(arguments[target][0], arguments[target][1])
   }
 }
 
@@ -70,4 +70,24 @@ util.getTime = function(callback) {
   timeDom.style.position = 'absolute'
   var b = document.getElementsByTagName('BODY')
   b[0].appendChild(timeDom)
+}
+
+util.addSelect = function() {
+  var wrapDom = document.createElement('FORM')
+  wrapDom.style.position = 'absolute'
+  var b = document.getElementsByTagName('BODY')
+  var that = arguments
+  for (var i = 0; i < arguments.length; i++) {
+    var ii = i
+    var radioDom = document.createElement('INPUT')
+    radioDom.setAttribute('type', 'radio')
+    radioDom.setAttribute('name', 'test')
+    radioDom.setAttribute('value', ii)
+
+    radioDom.onclick = function() {
+      that[radioDom.getAttribute('value')]()
+    }
+    wrapDom.appendChild(radioDom)
+  }
+  b[0].appendChild(wrapDom)
 }

@@ -36,6 +36,11 @@ Line.prototype.draw = function() {
   ctx.stroke()
 }
 
+var BezierCurve = function(opt) {
+  this.cp1x = opt.cp1x
+
+}
+
 var Circle = function(opt) {
   this.radii = opt.radii
   this.cx = opt.cx
@@ -84,7 +89,7 @@ Graph.prototype.getPoint = function() {
   }
 }
 
-Graph.prototype.draw = function() {
+Graph.prototype.drawLine = function() {
   this.getPoint()
   for (var i = 0; i < this.startPointList.length; i++) {
     var line = new Line({
@@ -99,21 +104,87 @@ Graph.prototype.draw = function() {
   }
 }
 
+Graph.prototype.drawCurve = function() {
+  this.getPoint()
+  ctx.strokeStyle = this.strokeStyle
+  ctx.lineWidth = this.lineWidth
+  for (var i = 0; i < this.startPointList.length; i++) {
+    ctx.beginPath()
+    ctx.moveTo(this.startPointList[i].x, this.startPointList[i].y)
+    ctx.bezierCurveTo(10, 20, 30, 30,
+        this.endPointList[i].x,
+        this.endPointList[i].y)
+      // ctx.closePath()
+    ctx.stroke()
+  }
+}
 
-var cir = new Circle({
-  radii: 200,
-  cx: cw / 2,
-  cy: ch / 2,
-  partNum: 1000,
-})
-
-var graph = new Graph({
-  circle: cir,
-  long: 100,
-  randomScope: [120, 0],
-  strokeStyle: '#444',
-  lineWidth: 5
-})
+Graph.prototype.draw = function(fun) {
+  this.getPoint()
+  ctx.strokeStyle = this.strokeStyle
+  ctx.lineWidth = this.lineWidth
+  for (var i = 0; i < this.startPointList.length; i++) {
+    fun(this, i)
+  }
+}
 
 
-graph.draw()
+function test1() {
+  var cir = new Circle({
+    radii: 200,
+    cx: cw / 2,
+    cy: ch / 2,
+    partNum: 1000,
+  })
+
+  var graph = new Graph({
+    circle: cir,
+    long: 130,
+    randomScope: [150, 0],
+    strokeStyle: '#444',
+    lineWidth: 5
+  })
+
+
+  graph.drawLine()
+}
+
+function test2() {
+  var cir = new Circle({
+    radii: 250,
+    cx: cw / 2,
+    cy: ch / 2,
+    partNum: 1000,
+  })
+
+  var graph = new Graph({
+    circle: cir,
+    long: 0,
+    randomScope: [20, 0],
+    strokeStyle: '#444',
+    lineWidth: 0.5
+  })
+
+  graph.draw(function(item, i) {
+    var delta = 20
+    var w = cw/2
+    var h = ch/2
+    ctx.beginPath()
+    ctx.moveTo(item.startPointList[i].x, item.startPointList[i].y)
+    ctx.bezierCurveTo(
+        util.random(w-delta, w+delta),
+        util.random(h-delta, h+delta),
+        util.random(w-delta, w+delta),
+        util.random(h-delta, h+delta),
+        item.endPointList[i].x,
+        item.endPointList[i].y)
+      // ctx.closePath()
+    ctx.stroke()
+  })
+}
+
+
+// test1()
+test2()
+
+// util.addSelect(test1,test2)
