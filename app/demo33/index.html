@@ -6,16 +6,21 @@
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> -->
   <!-- <link rel="stylesheet" href="bower_components/normalize.css/normalize.css"> -->
   <link type="text/css" rel="stylesheet" href="./scss/style.css">
-  <script id="shader-vs" type="x-shader/x-vertex">
-    attribute vec3 aVertexPosition;
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision mediump float;
+    void main(void) {
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+</script>
 
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
     uniform mat4 uMVMatrix;
     uniform mat4 uPMatrix;
-
-    void main(void){
-      gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
     }
-  </script>
+</script>
 </head>
 
 <body>
@@ -24,6 +29,7 @@
   <script src="../../bower_components/tinycolor/tinycolor.js"></script>
   <script src="../../myJsLib/util.js"></script>
   <script src="../../bower_components/three.js/three.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.1.0/gl-matrix-min.js"></script>
   <!--<script src="../../bower_components/greensock/src/uncompressed/TweenMax.js"></script>-->
   <!--<script src="../../bower_components/p5js/lib/p5.js"></script>-->
   <script src="./js/script.js"></script>
