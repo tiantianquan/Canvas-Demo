@@ -1,147 +1,143 @@
-var c = document.getElementById('c')
+var c = document.querySelector('#c')
+var ctx = c.getContext('2d')
 var cw = window.innerWidth
 var ch = window.innerHeight
-c.height = ch
 c.width = cw
-// gl = initWebGL(c)
+c.height = ch
 
-// function initWebGL(canvas) {
-//   gl = null;
+util.hackHighDpi(c, ctx)
 
-//   try {
-//     // Try to grab the standard context. If it fails, fallback to experimental.
-//     gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-//   } catch (e) {}
+cw = window.innerWidth
+ch = window.innerHeight
 
-//   // If we don't have a GL context, give up now
-//   if (!gl) {
-//     console.log("Unable to initialize WebGL. Your browser may not support it.");
-//     gl = null;
-//   }
+ctx.fillStyle = '#eee'
+ctx.fillRect(0, 0, c.width, c.height)
 
-//   return gl;
+//-------------------------------------------------
+//二维向量
+var Vector2 = function(x, y) {
+  this.x = x
+  this.y = y
+}
+
+//相减
+Vector2.prototype.sub = function(v) {
+  return new Vector2(this.x - v.x, this.y - v.y)
+}
+
+//相加
+Vector2.prototype.add = function(v) {
+  return new Vector2(this.x + v.x, this.y + v.y)
+}
+
+//点积
+Vector2.prototype.dot = function(v) {
+  return this.x * v.x + this.y * v.y
+}
+
+//包围体
+var OBB = function(center, rotateAngle, width, height) {
+  this.center = center
+  this.rotateAngle = rotateAngle
+  this.width = width
+  this.height = height
+
+  this.axisX = new Vector2(Math.cos(rotateAngle), Math.sin(rotateAngle))
+  this.axisY = new Vector2(-Math.sin(rotateAngle), Math.cos(rotateAngle))
+}
+
+//获得在axis上的投影半径
+OBB.prototype.getProjectionRadius = function(axis) {
+  return Math.abs(this.width / 2 * axis.dot(this.axisX)) + Math.abs(this.height / 2 * axis.dot(this.axisY))
+}
+
+
+//碰撞机
+var CollisionDetector = {}
+CollisionDetector.OBBvsOBB = function(obb1, obb2) {
+  var axis1 = obb1.axisX
+  var axis2 = obb1.axisY
+  var axis3 = obb2.axisX
+  var axis4 = obb2.axisY
+
+  var centerVec = obb1.center.sub(obb2.center)
+
+  if (Math.abs(axis1.dot(centerVec)) >= obb1.getProjectionRadius(axis1) + obb2.getProjectionRadius(axis1)) return false
+  if (Math.abs(axis2.dot(centerVec)) >= obb1.getProjectionRadius(axis2) + obb2.getProjectionRadius(axis2)) return false
+  if (Math.abs(axis3.dot(centerVec)) >= obb1.getProjectionRadius(axis3) + obb2.getProjectionRadius(axis3)) return false
+  if (Math.abs(axis4.dot(centerVec)) >= obb1.getProjectionRadius(axis4) + obb2.getProjectionRadius(axis4)) return false
+
+  return true
+}
+
+
+var SquareBox = function(opt) {
+  this.x = opt.x
+  this.y = opt.y
+  this.long = opt.long
+  this.fillStyle = opt.fillStyle
+  this.strokeStyle = opt.strokeStyle
+
+  if (opt.isOBB === true) {
+    this.obb = new OBB(new Vector2(this.x, this.y), 0, this.long, this.long)
+  }
+}
+
+// SquareBox.prototype.set = function(prop,val){
+//   this[prop] = val
+//   this.obb
 // }
 
-//--------------
-
-
-
-var gl;
-
-function initGL(canvas) {
-    try {
-        gl = canvas.getContext("webgl");
-        gl.viewportWidth = canvas.width;
-        gl.viewportHeight = canvas.height;
-    } catch (e) {}
-    if (!gl) {
-        alert("Could not initialise WebGL, sorry :-(");
-    }
+SquareBox.prototype.setX = function(val) {
+  this.x = val
+  this.obb.center.x = val
 }
 
-function getShader(gl, id) {
-    var shaderScript = document.getElementById(id);
-    if (!shaderScript) {
-        return null;
-    }
-    var str = "";
-    var k = shaderScript.firstChild;
-    while (k) {
-        if (k.nodeType == 3) {
-            str += k.textContent;
-        }
-        k = k.nextSibling;
-    }
-    var shader;
-    if (shaderScript.type == "x-shader/x-fragment") {
-        shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (shaderScript.type == "x-shader/x-vertex") {
-        shader = gl.createShader(gl.VERTEX_SHADER);
-    } else {
-        return null;
-    }
-    gl.shaderSource(shader, str);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
-        return null;
-    }
-    return shader;
-}
-var shaderProgram;
-
-function initShaders() {
-    var fragmentShader = getShader(gl, "shader-fs");
-    var vertexShader = getShader(gl, "shader-vs");
-    shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        alert("Could not initialise shaders");
-    }
-    gl.useProgram(shaderProgram);
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-}
-var mvMatrix = mat4.create();
-var pMatrix = mat4.create();
-
-function setMatrixUniforms() {
-    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-}
-var triangleVertexPositionBuffer;
-var squareVertexPositionBuffer;
-
-function initBuffers() {
-    triangleVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-    var vertices = [
-        0.0, 1.0, 0.0, -1.0, -1.0, 0.0,
-        1.0, -1.0, 0.0
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    triangleVertexPositionBuffer.itemSize = 3;
-    triangleVertexPositionBuffer.numItems = 3;
-    squareVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-    vertices = [
-        1.0, 1.0, 0.0, -1.0, 1.0, 0.0,
-        1.0, -1.0, 0.0, -1.0, -1.0, 0.0
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    squareVertexPositionBuffer.itemSize = 3;
-    squareVertexPositionBuffer.numItems = 4;
+SquareBox.prototype.setY = function(val) {
+  this.y = val
+  this.obb.center.y = val
 }
 
-function drawScene() {
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
-    mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
-    gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-    setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
-    mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-    setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+SquareBox.prototype.draw = function() {
+  var startPoint = [this.x - this.long / 2, this.y - this.long / 2]
+  ctx.beginPath()
+  ctx.moveTo(startPoint[0],startPoint[1])
+  ctx.lineTo(startPoint[0] + this.long, startPoint[1])
+  ctx.lineTo(startPoint[0] + this.long, startPoint[1] + this.long)
+  ctx.lineTo(startPoint[0], startPoint[1] + this.long)
+  ctx.closePath()
+  ctx.strokeStyle = this.strokeStyle
+  ctx.stroke()
 }
 
-function webGLStart() {
-    var canvas = document.getElementById("c");
-    initGL(canvas);
-    initShaders();
-    initBuffers();
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST);
-    drawScene();
-}
+var A = new SquareBox({
+  x: 100,
+  y: 100,
+  long: 100,
+  strokeStyle: 'blue',
+  isOBB: true
+})
 
-webGLStart()
+var B = new SquareBox({
+  x: 500,
+  y: 100,
+  long: 100,
+  strokeStyle: 'red',
+  isOBB: true
+})
+
+
+util.loop(function() {
+  ctx.clearRect(0, 0, cw, ch)
+
+  var x = A.x +1
+  A.setX(x)
+  if (CollisionDetector.OBBvsOBB(A.obb, B.obb)) {
+    A.strokeStyle = 'black'
+  }
+  else{
+    A.strokeStyle = 'blue'
+  }
+  A.draw()
+  B.draw()
+})
