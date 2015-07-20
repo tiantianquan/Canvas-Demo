@@ -1,13 +1,13 @@
 var c = document.querySelector('#c')
 var ctx = c.getContext('2d')
-var cw = 800
+var cw = window.innerWidth
 var ch = window.innerHeight
 c.width = cw
 c.height = ch
 
 util.hackHighDpi(c, ctx)
 
-cw = 800
+cw = window.innerWidth
 ch = window.innerHeight
 
 ctx.fillStyle = '#eee'
