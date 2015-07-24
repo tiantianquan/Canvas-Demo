@@ -15,10 +15,10 @@ ctx.fillRect(0, 0, c.width, c.height)
 
 //----------------------------------------
 
-var vec = new Vector2(100,0)
+var worldSpace = new WorldSpace(new Vector2(cw / 2, ch / 2))
 
-ctx.fillStyle= '#000'
-ctx.fillRect(vec.x,vec.y,10,10)
 
-vec = vec.rotate(Math.PI/2)
-ctx.fillRect(vec.x,vec.y,10,10)
+util.loop(function() {
+  ctx.fillStyle = '#000'
+  ctx.fillRect(a.x, a.y, 10, 10)
+})

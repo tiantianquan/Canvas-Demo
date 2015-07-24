@@ -1,8 +1,9 @@
 //矢量
-var Vector2 = function(x, y) {
+var Vector2 = function(x, y, space) {
   this.x = x
   this.y = y
   this.push(x, y)
+  this.space = space
 }
 
 Vector2.prototype = new Array()
@@ -40,10 +41,8 @@ Vector2.prototype.cosAngle = function(vec) {
 
 //乘以矩阵
 Vector2.prototype.multiplyMat = function(mat) {
-  var arr = []
-  arr[0] = this[0]
-  arr[1] = this[1]
-  arr[2] = 1
+  var arr = this.convertToArr()
+  arr.push(1)
 
   return [
     arr[0] * mat[0][0] + arr[1] * mat[1][0] + arr[2] * mat[2][0],
@@ -69,6 +68,11 @@ Vector2.prototype.scale = function(sx, sy) {
     return this.multiplyMatToVec(Matrix.scaleMat(sx))
   else
     return this.multiplyMatToVec(Matrix.scaleMat(sx, sy))
+}
+
+//转换为普通数组
+Vector2.prototype.convertToArr = function() {
+  return [this[0], this[1]]
 }
 
 //矩阵
@@ -115,3 +119,59 @@ Matrix.scaleMat = function(sx, sy) {
   else
     return new Matrix([sx, 0, 0], [0, sy, 0], [0, 0, 1])
 }
+
+//空间
+
+//@{origin} vec 相对父空间原点
+//@{theta} PI 旋转角度
+var Space = function(origin, theta, superSpace) {
+  this.origin = origin
+  this.rotateAngle = theta === undefined ? 0 : theta
+  this.superSpace = superSpace
+}
+
+//转换到父空间
+Space.prototype.convertToSuperMat = function() {
+  //相对平移
+  var transVec = this.origin
+    //轴单位矢量
+    // var xAxisNormal = this.origin.add(new Vector2(1, 0).rotate(this.rotateAngle))
+    // var yAxisNormal = this.origin.add(new Vector2(0, 1).rotate(this.rotateAngle))
+  var xAxisNormal = new Vector2(1, 0).rotate(this.rotateAngle)
+  var yAxisNormal = new Vector2(0, 1).rotate(this.rotateAngle)
+
+  var arr1 = xAxisNormal.convertToArr()
+  var arr2 = yAxisNormal.convertToArr()
+  var arr3 = transVec.convertToArr()
+  arr1.push(0)
+  arr2.push(0)
+  arr3.push(0)
+
+  return new Matrix(arr1, arr2, arr3)
+}
+
+//世界空间,默认为屏幕中心
+var WorldSpace = function(center) {
+  this.center = center
+}
+
+WorldSpace.prototype = new Space(new Vector2(0, 0))
+
+WorldSpace.prototype.getRealPoint = function(vec) {
+  return new Vector2(this.center.x + vec.x, this.center.y - vec.y)
+}
+
+//转换到另一空间(另一空间不能有旋转)
+// Space.prototype.convertToOtherSpaceMat = function(otherSpace) {
+//   //相对平移
+//   var transVec = this.origin.sub(otherSpace.origin)
+//     //轴单位矢量
+//   var xAxisNormal = this.origin.add(new Vector2(1, 0).rotate(this.rotateAngle)).sub(oterSpace.origin)
+//   var yAxisNormal = this.origin.add(new Vector2(0, 1).rotate(this.rotateAngle)).sub(oterSpace.origin)
+
+//   return new Matrix(
+//     xAxisNormal.convertToArr().push(0),
+//     yAxisNormal.convertToArr().push(0),
+//     transVec.convertToArr().push(0)
+//   )
+// }
