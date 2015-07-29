@@ -175,3 +175,53 @@ WorldSpace.prototype.getRealPoint = function(vec) {
 //     transVec.convertToArr().push(0)
 //   )
 // }
+
+
+//时间线
+var TimeLine = function(opt) {
+  this.deltTime = 1 / opt.frame
+}
+
+TimeLine.prototype.start = function(mainFun) {
+  setInterval(mainFun, this.deltTime)
+}
+
+
+var Clock = function(opt) {
+  this.timeCycles = opt.timeCycles
+  this.timeScale = opt.timeScale
+  this.isPaused = opt.isPaused
+  this.cyclesPerSecond = opt.cyclesPerSecond
+}
+
+Clock.prototype = {
+  secondsToCycles: function(timeSeconds) {
+    return timeSeconds * this.cyclesPerSecond
+  },
+  cyclesToSeconds: function(timeCycles) {
+    return timeCycles / this.cyclesPerSecond
+  },
+  getTimeCycles: function() {
+    return this.timeCycles
+  },
+  update: function(dtRealSeconds) {
+    if (!this.isPaused) {
+      var dtScaledCycles = this.secondsToCycles(dtRealSeconds * this.timeScale)
+      this.timeCycles += dtScaledCycles
+    }
+  },
+  setPaused: function(isPaused) {
+    this.isPaused = isPaused
+  },
+  setTimeScale: function(scale) {
+    this.timeScale = scale
+  },
+  singleStep: function() {
+    if (this.isPaused) {
+      var dtScaledCycles = this.secondsToCycles(1 / 30 * this.timeScale)
+
+      this.timeCycles += dtScaledCycles
+    }
+  }
+
+}
