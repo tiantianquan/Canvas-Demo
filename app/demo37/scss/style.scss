@@ -1,0 +1,45 @@
+@import"bourbon";
+@import"neat";
+@import"bootstrap/mixins";
+@import"bootstrap/variables";
+@import"bootstrap/normalize";
+// @import"font-awesome";
+$mobile: new-breakpoint(max-width 480px 12);
+$pad: new-breakpoint(max-width 720px 12);
+@mixin center {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  margin: auto;
+}
+
+div.wrapper {
+  max-width: 960px;
+  @include make-row();
+  margin: 0 auto;
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.col {
+  height: 100px;
+  @include make-xs-column(3);
+
+  @include media($pad) {
+    @include make-xs-column(6);
+  }
+  ;
+  @include media($mobile) {
+    @include make-xs-column(12);
+  }
+  ;
+}
+
+.content {
+  background-color: #eee;
+  height: 100%;
+  // @include transform(translateX(50%));
+}
